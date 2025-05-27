@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>容器NIX脚本生成器</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #eef2f7;
+            color: #333;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 25px;
+        }
+        .section {
+            background: #ffffff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            border-top: 4px solid #007bff;
+        }
+        h2 {
+            color: #007bff;
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin: 15px 0 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"], input[type="number"], textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+        }
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        button.generate-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        button.generate-btn:hover {
+            background-color: #218838;
+        }
+        button.copy-btn {
+            background-color: #17a2b8;
+            color: white;
+        }
+        button.copy-btn:hover {
+            background-color: #138496;
+        }
+        button.random-btn {
+            background-color: #ffc107;
+            color: #333;
+        }
+        button.random-btn:hover {
+            background-color: #e0a800;
+        }
+         button.reset-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        button.reset-btn:hover {
+            background-color: #c82333;
+        }
+
+        .button-group {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .instructions {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+        .instructions p {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>容器NIX脚本生成器</h1>
+
+    <div class="section">
+        <h2>容器NIX脚本</h2>
+
+        <div class="instructions">
+            <h3>使用说明</h3>
+            <p>1. 输入或生成 UUID。</p>
+            <p>2. 输入或生成 VPS 可使用的端口 (VMPT)。</p>
+            <p>3. 点击“生成脚本”按钮。</p>
+            <p>4. 复制生成的脚本并粘贴到你的容器终端执行。</p>
+        </div>
+
+        <label for="nix-temp-uuid">UUID:</label>
+        <input type="text" id="nix-temp-uuid" placeholder="请输入UUID">
+        <button class="random-btn" onclick="generateUUID('nix-temp-uuid')">随机生成UUID</button>
+
+        <label for="nix-temp-vmpt">VMPT (端口):</label>
+        <input type="text" id="nix-temp-vmpt" placeholder="请输入VPS可使用的端口">
+        <button class="random-btn" onclick="generateRandomPort('nix-temp-vmpt')">随机生成端口</button>
+
+        <div class="button-group">
+             <button class="reset-btn" onclick="resetSection('nix-temp')">重置</button>
+            <button class="generate-btn" onclick="generateScript('nix-temp')">生成脚本</button>
+        </div>
+
+        <label for="nix-temp-output">生成的脚本:</label>
+        <textarea id="nix-temp-output" readonly placeholder="生成的脚本将显示在这里"></textarea>
+        <button class="copy-btn" onclick="copyToClipboard('nix-temp-output')">复制脚本</button>
+    </div>
+
+    <script>
+        // 生成随机 UUID 的函数，符合 UUID v4 格式
+        function generateUUID(inputId) {
+            const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+            document.getElementById(inputId).value = uuid;
+        }
+
+        // 生成随机端口号（1024 到 49151 之间）
+        function generateRandomPort(inputId) {
+            const minPort = 1024;
+            const maxPort = 49151;
+            const port = Math.floor(Math.random() * (maxPort - minPort + 1)) + minPort;
+            document.getElementById(inputId).value = port;
+        }
+
+        // 生成 Argo 脚本的函数，根据模板类型（这里固定为 nix-temp）
+        function generateScript(type) {
+             if (type !== 'nix-temp') {
+                alert('无效的模板类型！');
+                return;
+            }
+
+            const uuid = (document.getElementById(type + '-uuid').value || '').trim();
+            const vmpt = (document.getElementById(type + '-vmpt').value || '').trim();
+
+            if (!uuid || !vmpt) {
+                alert('请填写 UUID 和 VMPT 字段！');
+                return;
+            }
+
+            // 定义脚本的基础部分
+            const baseScript = 'bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/argosb/main/argotianjia)';
+
+            // 拼接脚本
+            const scriptParts = [
+                'nix=y',
+                'uuid=' + uuid,
+                'vmpt=' + vmpt,
+                baseScript
+            ];
+
+            const script = scriptParts.join(' ');
+
+            // 将脚本显示在输出框中
+            document.getElementById(type + '-output').value = script;
+        }
+
+        // 复制输出框内容的函数
+        function copyToClipboard(outputId) {
+            const textarea = document.getElementById(outputId);
+            textarea.select();
+            textarea.setSelectionRange(0, 99999); // For mobile devices
+            try {
+                document.execCommand('copy');
+                alert('已复制到剪贴板！');
+            } catch (err) {
+                console.error('复制失败: ', err);
+                alert('复制失败，请手动复制！');
+            }
+        }
+
+         // 重置单个模板
+        function resetSection(type) {
+            if (type === 'nix-temp') {
+                document.getElementById(type + '-uuid').value = '';
+                document.getElementById(type + '-vmpt').value = '';
+                document.getElementById(type + '-output').value = '';
+                alert('容器NIX脚本模板已重置！');
+            }
+        }
+
+    </script>
+
+</body>
+</html>

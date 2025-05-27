@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux终端通用固定Argo脚本生成器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .section {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: #fff;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .random-btn {
+            background-color: #28a745;
+        }
+        .random-btn:hover {
+            background-color: #218838;
+        }
+        .copy-btn {
+            background-color: #17a2b8;
+        }
+        .copy-btn:hover {
+            background-color: #138496;
+        }
+        .sync-btn {
+            background-color: #6f42c1;
+        }
+        .sync-btn:hover {
+            background-color: #5a32a3;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .instructions {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9e9e9;
+            border-left: 4px solid #007BFF;
+            margin-bottom: 20px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Linux终端通用固定Argo脚本生成器</h1>
+
+    <div class="instructions">
+        <h3>使用说明:</h3>
+        <p>1. 在下方输入框中填写或生成您的UUID、端口、ArgoToken和域名。</p>
+        <p>2. 点击“生成”按钮获取脚本。</p>
+        <p>3. 点击“复制结果”按钮将生成的脚本复制到剪贴板。</p>
+        <p>4. 将复制的脚本粘贴到您的Linux终端中执行。</p>
+    </div>
+
+    <!-- Linux 终端通用固定 Argo 模板 -->
+    <div class="section">
+        <h2>Linux终端通用固定Argo脚本</h2>
+        <!-- UUID 输入框 -->
+        <label for="linux-uuid">UUID:</label>
+        <input type="text" id="linux-uuid" placeholder="请输入UUID">
+        <button class="random-btn" onclick="generateUUID('linux-uuid')">随机</button>
+
+        <!-- VMPT 输入框 -->
+        <label for="linux-vmpt">VMPT (端口):</label>
+        <input type="text" id="linux-vmpt" placeholder="请输入VPS可使用的端口">
+        <button class="random-btn" onclick="generateRandomPort('linux-vmpt')">随机</button>
+
+        <!-- AGK 输入框 -->
+        <label for="linux-agk">AGK (ArgoToken):</label>
+        <input type="text" id="linux-agk" placeholder="请输入ArgoToken">
+
+        <!-- Domain 输入框 -->
+        <label for="linux-domain">Domain (域名):</label>
+        <input type="text" id="linux-domain" placeholder="请输入域名">
+
+        <!-- 生成按钮 -->
+        <button onclick="generateScript('linux')">生成</button>
+        <button onclick="resetSection('linux')">重置</button>
+        <!-- 输出框：只读 -->
+        <textarea id="linux-output" readonly></textarea>
+        <!-- 复制按钮 -->
+        <button class="copy-btn" onclick="copyToClipboard('linux-output')">复制结果</button>
+    </div>
+
+    <script>
+        // 生成随机 UUID 的函数，符合 UUID v4 格式
+        function generateUUID(inputId) {
+            const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+            document.getElementById(inputId).value = uuid;
+        }
+
+        // 生成随机端口号（1024 到 49151 之间）
+        function generateRandomPort(inputId) {
+            const minPort = 1024;
+            const maxPort = 49151;
+            const port = Math.floor(Math.random() * (maxPort - minPort + 1)) + minPort;
+            document.getElementById(inputId).value = port;
+        }
+
+        // 生成 Argo 脚本的函数，根据模板类型（这里只处理 linux）
+        function generateScript(type) {
+            if (type !== 'linux') {
+                alert('无效的模板类型！');
+                return;
+            }
+
+            const uuid = (document.getElementById('linux-uuid').value || '').trim();
+            const vmpt = (document.getElementById('linux-vmpt').value || '').trim();
+            const agk = (document.getElementById('linux-agk').value || '').trim();
+            const domain = (document.getElementById('linux-domain').value || '').trim();
+
+            let baseScript = 'cd ~ && curl -fsSL https://raw.githubusercontent.com/zhumengkang/agsb/main/agsb-v2.py | python3 - install';
+
+            if (!uuid || !vmpt || !agk || !domain) {
+                alert('请填写所有字段：UUID, VMPT, AGK 和 Domain！');
+                return;
+            }
+
+            const scriptParts = [
+                baseScript,
+                '--uuid', uuid,
+                '--port', vmpt,
+                '--agk', agk,
+                '--domain', domain
+            ];
+
+            const script = scriptParts.join(' ');
+
+            document.getElementById('linux-output').value = script;
+        }
+
+        // 复制输出框内容的函数
+        function copyToClipboard(outputId) {
+            const textarea = document.getElementById(outputId);
+            textarea.select();
+            document.execCommand('copy');
+            alert('已复制到剪贴板！');
+        }
+
+        // 重置单个模板
+        function resetSection(type) {
+             if (type === 'linux') {
+                document.getElementById('linux-uuid').value = '';
+                document.getElementById('linux-vmpt').value = '';
+                document.getElementById('linux-agk').value = '';
+                document.getElementById('linux-domain').value = '';
+                document.getElementById('linux-output').value = '';
+                alert('Linux 终端模板已重置！');
+             }
+        }
+    </script>
+</body>
+</html>

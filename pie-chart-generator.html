@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>扇形图标生成器（饼图） - AKI工具箱</title>
+    <link rel="icon" type="image/png" href="http://momo-1-img.ao1160301aila.workers.dev/favicon.ico">
+    <style>
+        html, body {
+            background: #f4f7fb;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .container {
+            margin: 32px auto 0 auto;
+            max-width: 800px; /* Adjusted for this specific tool */
+            width: 95vw;
+            background: #f8fcff;
+            border: 1px solid #cce;
+            border-radius: 12px;
+            padding: 32px 5vw 32px 5vw;
+            box-sizing: border-box;
+            box-shadow: 0 2px 16px 0 rgba(180,200,230,0.07);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 28px;
+            letter-spacing: 1px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .btn {
+            padding: 8px 28px;
+            font-size: 1.08em;
+            border: 1px solid #0077cc;
+            background: #e6f2ff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #cce6ff;
+        }
+         .pie-row {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        .pie-label, .pie-value {
+            padding: 4px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .pie-remove, .pie-up, .pie-down {
+            padding: 4px 8px;
+            margin-left: 4px;
+        }
+        #piePreview canvas {
+            display: block;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+        }
+         @media (max-width: 900px) {
+            .container {
+                max-width: 99vw;
+                padding: 18px 2vw 18px 2vw;
+            }
+        }
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                padding: 8px 0 8px 0;
+            }
+            h1 { font-size: 1.2em; }
+            .pie-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .pie-label, .pie-value, .pie-remove, .pie-up, .pie-down {
+                margin-left: 0;
+                margin-top: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>扇形图标生成器（饼图）</h1>
+
+        <div class="section">
+            <p>输入每个类别的名称和它所占的比例（百分比）。</p>
+            <form id="pieForm" onsubmit="return false;">
+                <div id="pieInputs">
+                    <div class="pie-row">
+                        <input type="text" class="pie-label" placeholder="类别" style="width:120px;">
+                        <input type="number" class="pie-value" placeholder="比例（百分比）" style="width:120px; margin-left: 8px;">
+                        <button type="button" class="btn pie-remove" style="display:none;">删除</button>
+                        <button type="button" class="btn pie-up">↑</button>
+                        <button type="button" class="btn pie-down">↓</button>
+                    </div>
+                </div>
+                <button type="button" class="btn" id="pieAddBtn" style="margin-top: 10px;">添加类别</button>
+                <button type="button" class="btn" id="pieGenBtn" style="margin-left: 12px; margin-top: 10px;">生成统计图</button>
+            </form>
+            <div id="piePreview" style="margin-top: 18px;"></div>
+            <button type="button" class="btn" id="pieSaveBtn" style="margin-top: 10px; display: none;">保存图片</button>
+        </div>
+    </div>
+
+    <footer id="footer" style="width:100%;text-align:center;padding:24px 0 12px 0; background:rgba(0,0,0,0.04);margin-top:40px;">
+        <div style="margin-bottom:8px;">
+            <a href="https://youtube.com/你的频道" target="_blank" title="YouTube" class="footer-icon">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg" alt="YouTube" style="width:28px;height:28px;margin:0 10px;vertical-align:middle;">
+            </a>
+            <a href="https://x.com/你的账号" target="_blank" title="X" class="footer-icon">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X" style="width:28px;height:28px;margin:0 10px;vertical-align:middle;">
+            </a>
+            <a href="https://discord.com/你的账号" target="_blank" title="discord" class="footer-icon">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/discord.svg" alt="discord" style="width:28px;height:28px;margin:0 10px;vertical-align:middle;">
+            </a>
+            <a href="https://instagram.com/你的账号" target="_blank" title="Instagram" class="footer-icon">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" style="width:28px;height:28px;margin:0 10px;vertical-align:middle;">
+            </a>
+            <a href="https://github.com/akxxxxxxxxx9" target="_blank" title="GitHub" class="footer-icon">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="GitHub" style="width:28px;height:28px;margin:0 10px;vertical-align:middle;">
+            </a>
+            <a href="https://web.telegram.org/你的账号" target="_blank" title="telegram" class="footer-icon">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="telegram" style="width:28px;height:28px;margin:0 10px;vertical-align:middle;">
+            </a>
+        </div>
+        <div style="margin-top:10px;font-size:15px;color:#555;">
+            团队成员：SUOU AKI
+        </div>
+        <div style="margin-top:8px;font-size:13px;color:#aaa;">
+            &copy; 2025 AKI | Powered by Cloudflare Workers
+        </div>
+    </footer>
+
+    <script>
+        (function(){
+            const pieInputs = document.getElementById('pieInputs');
+            const pieAddBtn = document.getElementById('pieAddBtn');
+            const pieGenBtn = document.getElementById('pieGenBtn');
+            const piePreview = document.getElementById('piePreview');
+            const pieSaveBtn = document.getElementById('pieSaveBtn'); // Added
+            function addPieRow(label = '', value = '', canRemove = true) {
+                const row = document.createElement('div');
+                row.className = 'pie-row'; // Use class for consistent styling
+                const labelInput = document.createElement('input');
+                labelInput.type = 'text';
+                labelInput.className = 'pie-label';
+                labelInput.placeholder = '类别';
+                labelInput.style.width = '120px';
+                labelInput.value = label;
+                const valueInput = document.createElement('input');
+                valueInput.type = 'number';
+                valueInput.className = 'pie-value';
+                valueInput.placeholder = '比例（百分比）';
+                valueInput.style.width = '120px';
+                valueInput.style.marginLeft = '8px'; // Add margin
+                valueInput.value = value;
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'btn pie-remove';
+                removeBtn.textContent = '删除';
+                removeBtn.style.marginLeft = '8px';
+                if (!canRemove) removeBtn.style.display = 'none';
+                removeBtn.onclick = function() {
+                    pieInputs.removeChild(row);
+                     if (pieInputs.children.length === 1) {
+                        pieInputs.children[0].querySelector('.pie-remove').style.display = 'none';
+                    }
+                };
+                // 上移按钮
+                const upBtn = document.createElement('button');
+                upBtn.type = 'button';
+                upBtn.className = 'btn pie-up';
+                upBtn.textContent = '↑';
+                upBtn.style.marginLeft = '8px';
+                upBtn.onclick = function() {
+                    const prev = row.previousElementSibling;
+                    if (prev) pieInputs.insertBefore(row, prev);
+                };
+                // 下移按钮
+                const downBtn = document.createElement('button');
+                downBtn.type = 'button';
+                downBtn.className = 'btn pie-down';
+                downBtn.textContent = '↓';
+                downBtn.style.marginLeft = '4px';
+                downBtn.onclick = function() {
+                    const next = row.nextElementSibling;
+                    if (next) pieInputs.insertBefore(next, row);
+                };
+                row.appendChild(labelInput);
+                row.appendChild(valueInput);
+                row.appendChild(removeBtn);
+                row.appendChild(upBtn);
+                row.appendChild(downBtn);
+                pieInputs.appendChild(row);
+                 // Always ensure the first row's remove button is hidden
+                if (pieInputs.children.length === 1) {
+                    pieInputs.children[0].querySelector('.pie-remove').style.display = 'none';
+                } else {
+                     // Show remove button for all rows if there's more than one
+                     Array.from(pieInputs.children).forEach(child => {
+                         const removeButton = child.querySelector('.pie-remove');
+                         if (removeButton) removeButton.style.display = '';
+                     });
+                 }
+            }
+            pieAddBtn.onclick = function() {
+                addPieRow('', '', true);
+            };
+            // 初始添加一行
+             addPieRow('', '', true); // Start with one row that can be removed if more are added
+
+            pieGenBtn.onclick = function() {
+                // 获取所有输入
+                const labels = Array.from(document.querySelectorAll('.pie-label')).map(e=>e.value.trim());
+                const values = Array.from(document.querySelectorAll('.pie-value')).map(e=>parseFloat(e.value));
+                // 校验
+                if (labels.length === 0 || values.length === 0 || values.some(isNaN) || labels.some(l=>!l)) {
+                    piePreview.innerHTML = '<span style="color:red;">请填写所有类别和比例。</span>';
+                    pieSaveBtn.style.display = 'none';
+                    return;
+                }
+                 // Filter out rows with missing label or value
+                const validData = [];
+                for(let i = 0; i < labels.length; i++) {
+                    if (labels[i] && !isNaN(values[i]) && values[i] > 0) { // Only include rows with label and positive value
+                         validData.push({ label: labels[i], value: values[i] });
+                    }
+                }
+
+                 if (validData.length === 0) {
+                    piePreview.innerHTML = '<span style="color:red;">请填写有效的类别和比例（比例需大于0）。</span>';
+                    pieSaveBtn.style.display = 'none';
+                    return;
+                 }
+
+                const total = validData.reduce((a,b)=>a+b.value,0);
+
+                // 生成饼图canvas，动态高度，图例右侧排列，图例宽度自适应
+                const pieSize = 220;
+                const legendLineHeight = 32;
+                const legendPadding = 18;
+                // 先计算最大图例文本宽度
+                const tmpCanvas = document.createElement('canvas');
+                const tmpCtx = tmpCanvas.getContext('2d');
+                tmpCtx.font = '15px Arial';
+                let maxLegendTextWidth = 0;
+                for (let i=0;i<validData.length;i++) {
+                    const percent = ((validData[i].value/total)*100).toFixed(1);
+                    const text = validData[i].label + ' (' + percent + '%)';
+                    const w = tmpCtx.measureText(text).width;
+                    if (w > maxLegendTextWidth) maxLegendTextWidth = w;
+                }
+                const legendWidth = 40 + Math.ceil(maxLegendTextWidth); // 20色块+间距+文本
+                const canvasHeight = Math.max(pieSize, validData.length * legendLineHeight + legendPadding*2);
+                const canvasWidth = pieSize + legendWidth + legendPadding*2;
+                const canvas = document.createElement('canvas');
+                canvas.width = canvasWidth;
+                canvas.height = canvasHeight;
+                const ctx = canvas.getContext('2d');
+                // 先填充白色背景
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                // 饼图
+                const pieCenterX = pieSize/2 + legendPadding; // Center X considering padding
+                const pieCenterY = canvasHeight/2; // Center Y for the canvas height
+                const radius = pieSize/2 - 4;
+                let start = 0;
+                const colors = ['#FFB300','#FF7043','#66BB6A','#42A5F5','#AB47BC','#EC407A','#26C6DA','#FFA726','#8D6E63','#789262','#D4E157','#FF8A65','#90A4AE'];
+                for (let i=0;i<validData.length;i++) {
+                    const angle = validData[i].value/total * Math.PI*2;
+                    ctx.beginPath();
+                    ctx.moveTo(pieCenterX, pieCenterY);
+                    ctx.arc(pieCenterX, pieCenterY, radius, start, start+angle);
+                    ctx.closePath();
+                    ctx.fillStyle = colors[i%colors.length];
+                    ctx.fill();
+                    start += angle;
+                }
+                // 图例
+                ctx.font = '15px Arial';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                let legendY = legendPadding + legendLineHeight/2; // Adjust starting Y for legend
+                const legendX = pieSize + legendPadding + 10;
+                for (let i=0;i<validData.length;i++) {
+                    ctx.fillStyle = colors[i%colors.length];
+                    ctx.fillRect(legendX, legendY - 10, 20, 20); // Adjust rectangle position based on legendY
+                    ctx.fillStyle = '#222';
+                    const percent = ((validData[i].value/total)*100).toFixed(1);
+                    ctx.fillText(validData[i].label + ' (' + percent + '%)', legendX+28, legendY);
+                    legendY += legendLineHeight;
+                }
+                piePreview.innerHTML = '';
+                piePreview.appendChild(canvas);
+                pieSaveBtn.style.display = '';
+                pieSaveBtn.onclick = function() {
+                    const link = document.createElement('a');
+                    link.href = canvas.toDataURL('image/png');
+                    link.download = 'piechart.png';
+                    link.click();
+                };
+            };
+
+        })();
+    </script>
+</body>
+</html>

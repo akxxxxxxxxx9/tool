@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Base64 在线编码/解码 - AKI工具箱</title>
+    <link rel="icon" type="image/png" href="http://momo-1-img.ao1160301aila.workers.dev/favicon.ico">
+    <style>
+        html, body {
+            background: #f4f7fb;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .container {
+            margin: 32px auto 0 auto;
+            max-width: 1440px;
+            width: 95vw;
+            background: #f8fcff;
+            border: 1px solid #cce;
+            border-radius: 12px;
+            padding: 32px 5vw 32px 5vw;
+            box-sizing: border-box;
+            box-shadow: 0 2px 16px 0 rgba(180,200,230,0.07);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 28px;
+            letter-spacing: 1px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section label {
+            margin-right: 16px;
+        }
+        .result {
+            margin-top: 22px;
+            font-size: 1.25em;
+            word-break: break-all;
+            background: #fff;
+            border: 1px solid #eee;
+            padding: 14px;
+            border-radius: 6px;
+        }
+        .btn {
+            padding: 8px 28px;
+            font-size: 1.08em;
+            border: 1px solid #0077cc;
+            background: #e6f2ff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #cce6ff;
+        }
+        /* Base64工具区输入框和结果区样式增强 */
+        #b64_input, #b64_output {
+            width: 100%;
+            min-height: 250px;
+            font-size: 1.18em;
+            padding: 30px 20px;
+            border-radius: 6px;
+            border: 1.5px solid #bcd;
+            margin-bottom: 8px;
+            box-sizing: border-box;
+            background: #fafdff;
+            resize: vertical;
+            line-height: 1.7;
+        }
+        #b64_output {
+            font-weight: 500;
+            color: #0b1a2d;
+        }
+        @media (max-width: 900px) {
+            .container {
+                max-width: 99vw;
+                padding: 18px 2vw 18px 2vw;
+            }
+        }
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                padding: 8px 0 8px 0;
+            }
+            h1 { font-size: 1.2em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Base64 在线编码/解码</h1>
+
+        <div class="section">
+            <div style="margin-bottom:12px;">
+                <b>设置</b>
+                <div style="font-size:13px;color:#666;">（设置项仅对本次操作生效，不会存cookie）</div>
+                <div style="margin:8px 0;">
+                    字符集编码：
+                    <label><input type="radio" name="b64_charset" value="utf-8" checked>UTF-8</label>
+                    <label><input type="radio" name="b64_charset" value="gb2312">GB2312</label>
+                    <span style="color:#888;font-size:12px;">GB2312无法使用16进制输出</span>
+                </div>
+                <div style="margin:8px 0;">
+                    自动编码/解码：
+                    <label><input type="radio" name="b64_auto" value="off" checked>关闭</label>
+                    <label><input type="radio" name="b64_auto" value="encode">自动编码</label>
+                    <label><input type="radio" name="b64_auto" value="decode">自动解码</label>
+                </div>
+                <div style="margin:8px 0;">
+                    编码快捷键：<kbd>Ctrl</kbd> + <kbd>Enter</kbd>，解码快捷键：<kbd>Enter</kbd>
+                </div>
+                <div style="margin:8px 0;">
+                    解码输出格式：
+                    <label><input type="radio" name="b64_decode_fmt" value="text" checked>文本</label>
+                    <label><input type="radio" name="b64_decode_fmt" value="unicode">\\u</label>
+                    <label><input type="radio" name="b64_decode_fmt" value="hex">H</label>
+                    <label><input type="radio" name="b64_decode_fmt" value="entity">&#38;#</label>
+                    <label><input type="checkbox" id="b64_decode_space" checked>非纯文本输出时，加上空格</label>
+                </div>
+                <div style="margin:8px 0;">
+                    编码输出格式：
+                    <label><input type="radio" name="b64_encode_fmt" value="text" checked>文本</label>
+                    <label><input type="radio" name="b64_encode_fmt" value="hex">H</label>
+                    <label><input type="radio" name="b64_encode_fmt" value="unicode">{...}</label>
+                </div>
+                <div style="margin:8px 0;">
+                    编码输出格式：
+                    <label><input type="radio" name="b64_encode_out" value="text" checked>纯文本</label>
+                    <label><input type="radio" name="b64_encode_out" value="url">URL编码</label>
+                </div>
+                <div style="margin:8px 0;">
+                    编码字符替换：
+                    <label>将 <input type="text" id="b64_replace1_from" value="+" style="width:24px;"> 替换为 <input type="text" id="b64_replace1_to" style="width:24px;"> </label>
+                    <label>将 <input type="text" id="b64_replace2_from" value="/" style="width:24px;"> 替换为 <input type="text" id="b64_replace2_to" style="width:24px;"> </label>
+                    <label>将 <input type="text" id="b64_replace3_from" value="=" style="width:24px;"> 替换为 <input type="text" id="b64_replace3_to" style="width:24px;"> </label>
+                    <label><input type="checkbox" id="b64_decode_replace">解码时也替换</label>
+                </div>
+            </div>
+            <textarea id="b64_input" rows="4" style="width:100%;" placeholder="请输入要编码或解码的内容"></textarea>
+            <div style="margin:10px 0;">
+                <button class="btn" id="b64_encode">编码 (Encode)</button>
+                <button class="btn" id="b64_decode">解码 (Decode)</button>
+                <button class="btn" id="b64_swap" type="button" style="margin-left:8px;">互换</button>
+                <button class="btn" id="b64_reset" type="button" style="margin-left:8px;">重置</button>
+            </div>
+            <textarea id="b64_output" rows="4" style="width:100%;" readonly placeholder="结果显示区"></textarea>
+            <button class="btn" id="b64_copy" style="margin-top:8px;">复制结果</button>
+        </div>
+    </div>
+
+    <script>
+        // Base64工具区JS
+        function getB64Settings() {
+            return {
+                charset: document.querySelector('input[name="b64_charset"]:checked').value,
+                auto: document.querySelector('input[name="b64_auto"]:checked').value,
+                decode_fmt: document.querySelector('input[name="b64_decode_fmt"]:checked').value,
+                decode_space: document.getElementById('b64_decode_space').checked,
+                encode_fmt: document.querySelector('input[name="b64_encode_fmt"]:checked').value,
+                encode_out: document.querySelector('input[name="b64_encode_out"]:checked').value,
+                replace: [
+                    [document.getElementById('b64_replace1_from').value, document.getElementById('b64_replace1_to').value],
+                    [document.getElementById('b64_replace2_from').value, document.getElementById('b64_replace2_to').value],
+                    [document.getElementById('b64_replace3_from').value, document.getElementById('b64_replace3_to').value]
+                ],
+                decode_replace: document.getElementById('b64_decode_replace').checked
+            };
+        }
+        async function b64Call(action) {
+            const input = document.getElementById('b64_input').value;
+            const settings = getB64Settings();
+            // Using a placeholder API endpoint here. In a real Cloudflare Worker setup,
+            // this would be handled by the worker script as shown in the original tool.js.
+            // For a standalone page, you might need a server-side component or
+            // implement client-side Base64 encoding/decoding.
+            // The original code used a fetch to '/api/base64'.
+            // For this standalone page, we'll implement basic client-side Base64.
+            let result = '';
+            try {
+                let inputText = input;
+                 // Decode replace logic for client-side
+                if (action === 'decode' && settings && settings.decode_replace) {
+                    settings.replace.forEach(([from, to]) => {
+                         if (from && to) inputText = inputText.replaceAll(to, from);
+                     });
+                 }
+
+
+                if (action === 'encode') {
+                     // Simple Base64 encode (doesn't handle GB2312 or complex charsets)
+                    try {
+                         result = btoa(encodeURIComponent(inputText));
+                         // Encode replace logic for client-side
+                         if (settings && settings.replace) {
+                             settings.replace.forEach(([from, to]) => {
+                                 if (from && to) result = result.replaceAll(from, to);
+                             });
+                         }
+                          // Encode output format (URL encode)
+                         if (settings && settings.encode_out === 'url') {
+                             result = encodeURIComponent(result);
+                         }
+                    } catch (e) {
+                         result = '编码出错 (client-side): ' + e.message;
+                    }
+
+                } else if (action === 'decode') {
+                     // Simple Base64 decode (doesn't handle GB2312 or complex charsets)
+                    let raw = '';
+                    try {
+                         raw = decodeURIComponent(atob(inputText));
+                    } catch (e) {
+                         raw = atob(inputText);
+                    }
+
+                     // Decode output format
+                    if (settings && settings.decode_fmt === 'unicode') {
+                         result = Array.from(raw).map(c=>`\\u${c.charCodeAt(0).toString(16).padStart(4,'0')}`)
+                           .join(settings.decode_space ? ' ' : '');
+                     } else if (settings && settings.decode_fmt === 'hex') {
+                          result = Array.from(raw).map(c=>c.charCodeAt(0).toString(16).padStart(2,'0'))
+                            .join(settings.decode_space ? ' ' : '');
+                     } else if (settings && settings.decode_fmt === 'entity') {
+                          result = Array.from(raw).map(c=>`&#${c.charCodeAt(0)};`).join(settings.decode_space ? ' ' : '');
+                     } else {
+                         result = raw;
+                     }
+
+                }
+            } catch (e) {
+                result = '转换出错 (client-side): ' + e.message;
+            }
+
+            document.getElementById('b64_output').value = result || '';
+        }
+
+        document.getElementById('b64_encode').onclick = function() { b64Call('encode'); };
+        document.getElementById('b64_decode').onclick = function() { b64Call('decode'); };
+        document.getElementById('b64_copy').onclick = function() {
+            const output = document.getElementById('b64_output').value;
+            navigator.clipboard.writeText(output);
+        };
+        // 互换和重置
+        if (document.getElementById('b64_swap')) {
+            document.getElementById('b64_swap').onclick = function() {
+                const input = document.getElementById('b64_input');
+                const output = document.getElementById('b64_output');
+                const tmp = input.value;
+                input.value = output.value;
+                output.value = tmp;
+            };
+        }
+        if (document.getElementById('b64_reset')) {
+            document.getElementById('b64_reset').onclick = function() {
+                document.getElementById('b64_input').value = '';
+                document.getElementById('b64_output').value = '';
+                document.querySelector('input[name="b64_charset"][value="utf-8"]').checked = true;
+                document.querySelector('input[name="b64_auto"][value="off"]').checked = true;
+                document.querySelector('input[name="b64_decode_fmt"][value="text"]').checked = true;
+                document.getElementById('b64_decode_space').checked = true;
+                document.querySelector('input[name="b64_encode_fmt"][value="text"]').checked = true;
+                document.querySelector('input[name="b64_encode_out"][value="text"]').checked = true;
+                document.getElementById('b64_replace1_from').value = '+';
+                document.getElementById('b64_replace1_to').value = '';
+                document.getElementById('b64_replace2_from').value = '/';
+                document.getElementById('b64_replace2_to').value = '';
+                document.getElementById('b64_replace3_from').value = '=';
+                document.getElementById('b64_replace3_to').value = '';
+                document.getElementById('b64_decode_replace').checked = false;
+            };
+        }
+
+        // 自动编码/解码
+        document.getElementById('b64_input').addEventListener('input', function() {
+            const auto = document.querySelector('input[name="b64_auto"]:checked').value;
+            if (auto === 'encode') b64Call('encode');
+            if (auto === 'decode') b64Call('decode');
+        });
+        // 快捷键
+        document.getElementById('b64_input').addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') { b64Call('encode'); e.preventDefault(); }
+            if (!e.ctrlKey && e.key === 'Enter') { b64Call('decode'); e.preventDefault(); }
+        });
+
+    </script>
+</body>
+</html>

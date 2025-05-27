@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>草料二维码生成器</title>
+    <link rel="icon" type="image/png" href="http://momo-1-img.ao1160301aila.workers.dev/favicon.ico">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f4f7fb;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .section {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        label {
+            display: inline-block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        textarea {
+            width: calc(100% - 16px);
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        select {
+             padding: 8px;
+             border: 1px solid #ccc;
+             border-radius: 4px;
+             margin-left: 6px;
+             margin-right: 6px;
+        }
+        button {
+            padding: 10px 15px;
+            margin-right: 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: #fff;
+            transition: background-color 0.2s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 15px;
+            min-height: 40px;
+            text-align: center;
+        }
+        .result img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        #qrFileTip {
+            color: #d33;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+         .options {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .options label {
+            font-weight: normal;
+            margin-bottom: 0;
+        }
+         .options input[type="number"],
+         .options input[type="color"],
+         .options select {
+             padding: 4px;
+             margin-bottom: 0;
+         }
+         #qrSize { width: 60px; }
+         #qrBorder { width: 40px; }
+         #qrLogo { width: 110px; }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            button {
+                margin-bottom: 8px;
+            }
+             .options {
+                 flex-direction: column;
+                 align-items: flex-start;
+             }
+             .options label input, .options label select {
+                 margin-left: 0;
+             }
+        }
+    </style>
+</head>
+<body>
+    <h1>草料二维码生成器</h1>
+
+    <div class="section">
+        <h2>使用说明</h2>
+        <p>在此工具中，您可以输入文本、网址、名片信息，或上传文件（图片、音频、视频）来生成二维码。</p>
+        <ul>
+            <li>在输入框中输入您要生成二维码的内容。</li>
+            <li>选择内容类型（文本/网址或名片）。</li>
+            <li>点击“生成二维码”按钮。</li>
+            <li>您可以调整尺寸、前景色、背景色、边框和添加Logo。</li>
+            <li>选择二维码格式（PNG或SVG）。</li>
+            <li>点击“下载二维码”按钮保存生成的二维码。</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>生成二维码</h2>
+        <div style="margin-bottom: 8px;">
+            <input type="text" id="qrInput" placeholder="输入要生成二维码的内容（文本/网址/名片等）" style="width: calc(60% - 16px);">
+            <select id="qrType">
+                <option value="text">文本/网址</option>
+                <option value="vcard">名片（vCard）</option>
+            </select>
+            <button id="qrGenBtn">生成二维码</button>
+            <button id="qrResetBtn" type="button">重置</button>
+            <label style="margin-left: 14px;">
+                <input type="file" id="qrFileInput" accept="image/*,audio/*,video/*" style="display: none;">
+                <button type="button" id="qrFileBtn">选择文件</button>
+            </label>
+        </div>
+        <div id="qrFileTip"></div>
+        <div class="options">
+            <label>尺寸:<input type="number" id="qrSize" value="180" min="100" max="1000"></label>
+            <label>前景色:<input type="color" id="qrFgColor" value="#FFB8D4"></label>
+            <label>背景色:<input type="color" id="qrBgColor" value="#FFFFFF"></label>
+            <label>边框:<input type="number" id="qrBorder" value="2" min="0" max="20"></label>
+            <label>Logo:<input type="file" id="qrLogo" accept="image/*"></label>
+            <label>格式:
+                <select id="qrFormat">
+                    <option value="png">PNG</option>
+                    <option value="svg">SVG</option>
+                </select>
+            </label>
+            <button id="qrDownloadBtn" style="display: none;">下载二维码</button>
+        </div>
+        <div id="qrResult" class="result"></div>
+        <div id="qrHistoryBox" style="margin-top: 15px;"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
+    <script>
+        // ---------二维码生成器增强版--------- //
+        let qrCodeStyling = null;
+        let lastQrType = 'text';
+        let lastQrContent = '';
+        let lastQrLogo = null;
+
+        function getVCardFromInput(text) {
+            // 简单vCard格式示例：姓名;电话;邮箱
+            const [name, phone, email] = text.split(';');
+            return 'BEGIN:VCARD\\nVERSION:3.0\\nFN:' + (name || '') + '\\nTEL:' + (phone || '') + '\\nEMAIL:' + (email || '') + '\\nEND:VCARD';
+        }
+
+        document.getElementById('qrType').onchange = function() {
+            lastQrType = this.value;
+            document.getElementById('qrInput').placeholder = lastQrType === 'vcard' ? '名片内容：姓名;电话;邮箱' : '输入要生成二维码的内容（文本/网址/名片等）';
+        };
+
+        document.getElementById('qrGenBtn').onclick = function() {
+            const type = document.getElementById('qrType').value;
+            let text = document.getElementById('qrInput').value.trim();
+            if (!text) {
+                document.getElementById('qrResult').innerHTML = '<span style="color:red">请输入内容</span>';
+                return;
+            }
+            if (type === 'vcard') text = getVCardFromInput(text);
+            lastQrContent = text;
+
+            // 参数
+            const size = Math.max(100, Math.min(1000, parseInt(document.getElementById('qrSize').value) || 180));
+            const fgColor = document.getElementById('qrFgColor').value;
+            const bgColor = document.getElementById('qrBgColor').value;
+            const border = Math.max(0, Math.min(20, parseInt(document.getElementById('qrBorder').value) || 2));
+            const format = document.getElementById('qrFormat').value;
+
+            // 生成二维码
+            if (qrCodeStyling) qrCodeStyling.update({});
+            let qrOptions = {
+                width: size,
+                height: size,
+                data: text,
+                type: format,
+                margin: border,
+                dotsOptions: { color: fgColor },
+                backgroundOptions: { color: bgColor }
+            };
+
+            if (lastQrLogo) {
+                qrOptions.image = lastQrLogo;
+                qrOptions.imageOptions = { crossOrigin: 'anonymous', margin: 2, imageSize: 0.22 };
+            }
+
+            qrCodeStyling = new window.QRCodeStyling(qrOptions);
+            const qrDiv = document.getElementById('qrResult');
+            qrDiv.innerHTML = '';
+            qrCodeStyling.append(qrDiv);
+            document.getElementById('qrDownloadBtn').style.display = '';
+
+            // 预览dataURL内容
+            let preview = '';
+            if (lastQrContent.startsWith('data:image/')) {
+                preview = '<img src="' + lastQrContent + '" style="max-width:180px;max-height:180px;margin-top:8px;border:1px solid #ccc;">';
+            } else if (lastQrContent.startsWith('data:audio/')) {
+                preview = '<audio src="' + lastQrContent + '" controls style="width:170px;margin-top:8px;"></audio>';
+            } else if (lastQrContent.startsWith('data:video/')) {
+                preview = '<video src="' + lastQrContent + '" controls style="max-width:170px;max-height:120px;margin-top:8px;"></video>';
+            }
+            if (preview) qrDiv.innerHTML += '<div style="margin-top:12px;">预览：<br>' + preview + '</div>';
+        };
+
+        // 选择文件生成二维码
+        document.getElementById('qrFileBtn').onclick = function() {
+            document.getElementById('qrFileInput').click();
+        };
+        document.getElementById('qrFileInput').onchange = function(e) {
+            const file = e.target.files[0];
+            const tip = document.getElementById('qrFileTip');
+            if (!file) { tip.innerText = ''; return; }
+            if (file.size > 100 * 1024) {
+                tip.innerText = '文件过大（超过100KB），请先上传到网盘/图床后粘贴链接。';
+                document.getElementById('qrInput').value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                document.getElementById('qrInput').value = evt.target.result;
+                tip.innerText = '已自动填入dataURL，可直接生成二维码。';
+            };
+            reader.readAsDataURL(file);
+        };
+
+        document.getElementById('qrLogo').onchange = function(e) {
+            const file = e.target.files[0];
+            if (!file) { lastQrLogo = null; return; }
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                lastQrLogo = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        document.getElementById('qrDownloadBtn').onclick = function() {
+            if (!qrCodeStyling) return;
+            const format = document.getElementById('qrFormat').value;
+            qrCodeStyling.download({ name: 'qrcode', extension: format });
+        };
+
+         // 3. 二维码生成器重置
+        document.getElementById('qrResetBtn').onclick = function() {
+            document.getElementById('qrInput').value = '';
+            document.getElementById('qrType').value = 'text';
+            document.getElementById('qrSize').value = 180;
+            document.getElementById('qrFgColor').value = '#FFB8D4';
+            document.getElementById('qrBgColor').value = '#FFFFFF';
+            document.getElementById('qrBorder').value = 2;
+            document.getElementById('qrLogo').value = '';
+            document.getElementById('qrFormat').value = 'png';
+            document.getElementById('qrFileTip').innerText = '';
+            document.getElementById('qrResult').innerHTML = '';
+            lastQrLogo = null;
+            lastQrContent = '';
+        };
+
+
+        // 兼容原有API方式（可选，如果需要回退到旧的简易API）
+        // window.generateSimpleQr = function() {
+        //   var text = document.getElementById('qrInput').value.trim();
+        //   var qrDiv = document.getElementById('qrResult');
+        //   if (!text) {
+        //     qrDiv.innerHTML = '<span style="color:red">请输入内容</span>';
+        //     return;
+        //   }
+        //   var url = 'https://api.2dcode.biz/v1/create-qr-code?data=' + encodeURIComponent(text) + '&size=180x180';
+        //   qrDiv.innerHTML = '<img src="' + url + '" alt="二维码" style="border:1px solid #ccc;">';
+        // };
+    </script>
+</body>
+</html>

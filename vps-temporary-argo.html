@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主流VPS临时Argo脚本生成器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+            line-height: 1.6;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .section {
+            background: #fff;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin: 15px 0 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"] {
+            width: calc(100% - 110px); /* Adjust width considering button */
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+            display: inline-block;
+        }
+        button {
+            padding: 10px 18px;
+            margin-left: 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: #fff;
+            font-size: 1em;
+            transition: background-color 0.2s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .random-btn {
+            background-color: #28a745;
+        }
+        .random-btn:hover {
+            background-color: #218838;
+        }
+         .copy-btn {
+            background-color: #17a2b8;
+         }
+         .copy-btn:hover {
+            background-color: #138496;
+         }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            resize: vertical;
+            min-height: 150px;
+            font-family: Consolas, Monaco, \'Andale Mono\', \'Ubuntu Mono\', monospace;
+            font-size: 0.95em;
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        .instructions {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #e9f7ef;
+            border-left: 4px solid #4CAF50;
+            border-radius: 4px;
+            font-size: 0.95em;
+            color: #333;
+        }
+        .instructions h2 {
+            margin-top: 0;
+            color: #2e8b57;
+        }
+        .instructions ol {
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin-bottom: 10px;
+        }
+         .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+         }
+    </style>
+</head>
+<body>
+    <h1>主流VPS临时Argo脚本生成器</h1>
+
+    <div class="section">
+        <h2>生成您的临时Argo脚本</h2>
+
+        <label for="vps-temp-uuid">UUID:</label>
+        <input type="text" id="vps-temp-uuid" placeholder="请输入UUID">
+        <button class="random-btn" onclick="generateUUID('vps-temp-uuid')">随机生成UUID</button>
+
+        <label for="vps-temp-vmpt">VMPT (监听端口):</label>
+        <input type="text" id="vps-temp-vmpt" placeholder="请输入VPS可使用的端口">
+        <button class="random-btn" onclick="generateRandomPort('vps-temp-vmpt')">随机生成端口</button>
+
+        <div class="button-group">
+             <button onclick="generateScript('vps-temp')">生成脚本</button>
+             <button onclick="resetSection('vps-temp')">重置</button>
+        </div>
+
+        <textarea id="vps-temp-output" readonly placeholder="生成的脚本将显示在这里..."></textarea>
+        <button class="copy-btn" onclick="copyToClipboard('vps-temp-output')">复制脚本</button>
+    </div>
+
+    <div class="instructions">
+        <h2>使用说明</h2>
+        <ol>
+            <li>在 "UUID" 输入框中填入您的UUID。您可以手动输入或点击“随机生成UUID”按钮。</li>
+            <li>在 "VMPT (监听端口)" 输入框中填入您的VPS上可用的端口号。您可以手动输入或点击“随机生成端口”按钮。</li>
+            <li>点击“生成脚本”按钮，生成的临时Argo脚本将显示在下方文本区域。</li>
+            <li>点击“复制脚本”按钮，将生成的脚本复制到剪贴板。</li>
+            <li>将复制的脚本粘贴到您的VPS终端中执行。</li>
+            <li>**重要提示：** 临时Argo域名在断开连接或VPS重启后会失效。</li>
+        </ol>
+    </div>
+
+    <script>
+        // 生成随机 UUID 的函数，符合 UUID v4 格式
+        function generateUUID(inputId) {
+            const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+            document.getElementById(inputId).value = uuid;
+        }
+
+        // 生成随机端口号（1024 到 49151 之间）
+        function generateRandomPort(inputId) {
+            const minPort = 1024;
+            const maxPort = 49151;
+            const port = Math.floor(Math.random() * (maxPort - minPort + 1)) + minPort;
+            document.getElementById(inputId).value = port;
+        }
+
+        // 生成 Argo 脚本的函数，根据模板类型
+        function generateScript(type) {
+            const uuid = (document.getElementById(type + '-uuid').value || '').trim();
+            const vmpt = (document.getElementById(type + '-vmpt').value || '').trim();
+
+            if (!uuid || !vmpt) {
+                alert('请填写 UUID 和 VMPT 字段！');
+                return;
+            }
+
+            const baseScript = 'bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/argosb/main/argosb.sh)';
+
+            const scriptParts = [
+                'uuid=' + uuid,
+                'vmpt=' + vmpt,
+                baseScript
+            ];
+
+            const script = scriptParts.join(' ');
+            document.getElementById(type + '-output').value = script;
+        }
+
+        // 复制输出框内容的函数
+        function copyToClipboard(outputId) {
+            const textarea = document.getElementById(outputId);
+            textarea.select();
+            document.execCommand('copy');
+            alert('已复制到剪贴板！');
+        }
+
+        // 重置单个模板
+        function resetSection(type) {
+            document.getElementById(type + '-uuid').value = '';
+            document.getElementById(type + '-vmpt').value = '';
+            document.getElementById(type + '-output').value = '';
+            alert('模板已重置！');
+        }
+    </script>
+</body>
+</html>
