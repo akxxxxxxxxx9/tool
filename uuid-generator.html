@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>唯一标识生成器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #eee;
+            word-break: break-all;
+            font-family: monospace;
+            min-height: 40px;
+        }
+        .result div {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .result span {
+            flex: 1;
+            margin-right: 10px;
+        }
+         .result button {
+            padding: 4px 10px;
+            font-size: 0.9em;
+        }
+        .instructions {
+            margin-top: 20px;
+            padding: 15px;
+            border-top: 1px solid #eee;
+            font-size: 0.95em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>唯一标识生成器</h1>
+
+        <div class="section">
+            <h2>生成设置</h2>
+            <div style="margin-bottom: 10px;">
+                <label for="idCount">数量:</label>
+                <input type="text" id="idCount" value="6" style="width: 40px;">
+                <button id="idGenBtn">生成</button>
+                <button id="idResetBtn" type="button">重置</button>
+            </div>
+            <div id="idResult" class="result"></div>
+        </div>
+
+        <div class="instructions">
+            <h2>使用方法：</h2>
+            <p>1. 在“数量”输入框中输入您想要生成的唯一标识符的数量（默认6个）。</p>
+            <p>2. 点击“生成”按钮，将在下方显示生成的唯一标识符列表。</p>
+            <p>3. 每个生成的标识符旁边都有一个“复制”按钮，点击即可复制该标识符。</p>
+            <p>4. 点击“重置”按钮可以清空输入和结果。</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('idGenBtn').onclick = function() {
+            var n = Math.max(1, Math.min(50, parseInt(document.getElementById('idCount').value) || 1));
+            var result = [];
+            for (var i = 0; i < n; i++) {
+                var t = '';
+                var chars = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.split('');
+                for (var j = 0; j < chars.length; j++) {
+                    if (chars[j] === 'x') {
+                        t += (Math.random() * 16 | 0).toString(16);
+                    } else if (chars[j] === 'y') {
+                        t += ((Math.random() * 4 | 8)).toString(16);
+                    } else {
+                        t += chars[j];
+                    }
+                }
+                result.push(t);
+            }
+
+            document.getElementById('idResult').innerHTML = '';
+            result.forEach(function(e) {
+                var row = document.createElement('div');
+                var span = document.createElement('span');
+                span.textContent = e;
+                var btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.textContent = '复制';
+                btn.onclick = function() {
+                    navigator.clipboard.writeText(e);
+                    // Optional: Add a visual feedback
+                    btn.textContent = '已复制!';
+                     setTimeout(() => { btn.textContent = '复制'; }, 1500);
+                };
+                row.appendChild(span);
+                row.appendChild(btn);
+                document.getElementById('idResult').appendChild(row);
+            });
+        };
+
+        document.getElementById('idResetBtn').onclick = function() {
+            document.getElementById('idCount').value = 6;
+            document.getElementById('idResult').innerHTML = '';
+        };
+    </script>
+</body>
+</html>
