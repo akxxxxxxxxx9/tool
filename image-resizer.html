@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片尺寸调整 - AKI 工具箱</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #0056b3;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="file"], input[type="number"], select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        input[type="number"] {
+             width: 100px;
+             display: inline-block;
+             margin-right: 10px;
+        }
+        button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #previewArea {
+            margin-top: 20px;
+            text-align: center;
+            border: 1px dashed #ccc;
+            padding: 20px;
+            border-radius: 4px;
+        }
+        #previewImage {
+            max-width: 100%;
+            height: auto;
+            max-height: 300px;
+            margin-top: 15px;
+            display: none;
+        }
+        #downloadLink {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .dimensions label {
+            font-weight: normal;
+            margin-right: 5px;
+        }
+         .dimensions input[type="number"] {
+            width: 80px;
+         }
+         .actions {
+             margin-top: 20px;
+             text-align: center;
+         }
+          #status {
+            margin-top: 15px;
+            color: green;
+            font-weight: bold;
+          }
+           .error {
+            color: red;
+           }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <a class="back-home" href="index.html">返回主页</a>
+        <span class="header-title">工具页眉</span>
+      </header>
+      <style>
+        .page-header {
+          display: flex;
+          align-items: center;
+          background: #1976d2;
+          color: #fff;
+          padding: 12px 20px;
+          font-size: 1.2em;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .back-home {
+          color: #fff;
+          background: #1565c0;
+          border-radius: 4px;
+          padding: 5px 12px;
+          text-decoration: none;
+          margin-right: 18px;
+          font-weight: bold;
+          transition: background 0.2s;
+        }
+        .back-home:hover {
+          background: #0d47a1;
+        }
+        .header-title {
+          font-weight: bold;
+          font-size: 1.1em;
+          letter-spacing: 1px;
+        }
+      </style>
+    <div class="container">
+        <h1>图片尺寸调整</h1>
+        <p>上传图片，输入 desired new dimensions, and download the resized image.</p>
+
+        <div class="form-group">
+            <label for="imageUpload">选择图片:</label>
+            <input type="file" id="imageUpload" accept="image/*">
+        </div>
+
+        <div class="form-group">
+            <label>desired new dimensions (pixels):</label>
+            <div class="input-group dimensions">
+                 <label for="newWidth">Width:</label>
+                 <input type="number" id="newWidth" value="300" min="1">
+                 <label for="newHeight">Height:</label>
+                 <input type="number" id="newHeight" value="200" min="1">
+            </div>
+        </div>
+
+        <div class="actions">
+            <button id="resizeButton">调整尺寸</button>
+        </div>
+
+        <div id="status"></div>
+
+        <div id="previewArea" style="display: none;">
+            <h2>预览</h2>
+            <img id="previewImage" alt="Image Preview">
+            <a id="downloadLink" style="display: none;">下载调整后的图片</a>
+        </div>
+    </div>
+
+    <script>
+        const imageUpload = document.getElementById('imageUpload');
+        const newWidthInput = document.getElementById('newWidth');
+        const newHeightInput = document.getElementById('newHeight');
+        const resizeButton = document.getElementById('resizeButton');
+        const previewArea = document.getElementById('previewArea');
+        const previewImage = document.getElementById('previewImage');
+        const downloadLink = document.getElementById('downloadLink');
+        const statusDiv = document.getElementById('status');
+
+        let uploadedImage = null;
+        let uploadedFileName = '';
+        let uploadedFileType = '';
+
+        imageUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                uploadedFileName = file.name.split('.')[0];
+                uploadedFileType = file.type;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        uploadedImage = img;
+                        previewImage.src = e.target.result;
+                        previewImage.style.display = 'block';
+                        previewArea.style.display = 'block';
+                        statusDiv.textContent = `图片加载成功: ${file.name}`;
+                        statusDiv.className = ''; // Remove error class
+                         // Set default dimensions to original or a reasonable size
+                         newWidthInput.value = img.width;
+                         newHeightInput.value = img.height;
+                    };
+                    img.onerror = () => {
+                         statusDiv.textContent = '无法加载图片. 请确保文件是有效的图片格式.';
+                         statusDiv.className = 'error';
+                         previewArea.style.display = 'none';
+                         uploadedImage = null;
+                    };
+                    img.src = e.target.result;
+                };
+                 reader.onerror = () => {
+                     statusDiv.textContent = '文件读取失败.';
+                     statusDiv.className = 'error';
+                     previewArea.style.display = 'none';
+                      uploadedImage = null;
+                 };
+                reader.readAsDataURL(file);
+            } else {
+                 statusDiv.textContent = '请选择一个图片文件.';
+                 statusDiv.className = 'error';
+                 previewArea.style.display = 'none';
+                 uploadedImage = null;
+            }
+        });
+
+        resizeButton.addEventListener('click', () => {
+            if (!uploadedImage) {
+                statusDiv.textContent = '请先上传图片.';
+                statusDiv.className = 'error';
+                return;
+            }
+
+            const newWidth = parseInt(newWidthInput.value);
+            const newHeight = parseInt(newHeightInput.value);
+
+            if (isNaN(newWidth) || newWidth <= 0 || isNaN(newHeight) || newHeight <= 0) {
+                statusDiv.textContent = '请输入有效的宽度和高度 (大于 0).';
+                statusDiv.className = 'error';
+                return;
+            }
+
+            statusDiv.textContent = '正在调整尺寸...';
+            statusDiv.className = ''; // Remove error class
+
+            const canvas = document.createElement('canvas');
+            canvas.width = newWidth;
+            canvas.height = newHeight;
+            const ctx = canvas.getContext('2d');
+
+            // Draw the image onto the canvas with the new dimensions
+            ctx.drawImage(uploadedImage, 0, 0, newWidth, newHeight);
+
+            // Get the data URL of the resized image
+            const resizedImageUrl = canvas.toDataURL(uploadedFileType); // Use original file type
+
+            // Update preview and download link
+            previewImage.src = resizedImageUrl;
+            downloadLink.href = resizedImageUrl;
+            downloadLink.download = `${uploadedFileName}_resized.${uploadedFileType.split('/')[1]}`; // Suggest a filename
+            downloadLink.textContent = `下载调整后的图片 (${newWidth}x${newHeight})`;
+            downloadLink.style.display = 'block';
+
+            statusDiv.textContent = '尺寸调整完成.';
+        });
+    </script>
+     <footer id="footer">
+        <div class="footer-icons">
+          <a href="https://youtube.com/你的频道" target="_blank" title="YouTube" class="footer-icon">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg" alt="YouTube">
+          </a>
+          <a href="https://x.com/你的账号" target="_blank" title="X" class="footer-icon">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X">
+          </a>
+          <a href="https://discord.com/你的账号" target="_blank" title="discord" class="footer-icon">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/discord.svg" alt="discord">
+          </a>
+          <a href="https://instagram.com/你的账号" target="_blank" title="Instagram" class="footer-icon">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram">
+          </a>
+          <a href="https://github.com/akxxxxxxxxx9" target="_blank" title="GitHub" class="footer-icon">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="GitHub">
+          </a>
+          <a href="https://web.telegram.org/你的账号" target="_blank" title="telegram" class="footer-icon">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="telegram">
+          </a>
+        </div>
+        <div class="footer-team">
+          团队成员：SUOU AKI
+        </div>
+        <div class="footer-copy">
+          &copy; 2025 AKI | Powered by Cloudflare Workers
+        </div>
+</body>
+</html>
