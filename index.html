@@ -4,52 +4,135 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tool Box</title>
+    <link rel="icon" type="image/png" href="http://momo-1-img.ao1160301aila.workers.dev/favicon.ico">
     <style>
         body {
-            font-family: sans-serif;
-            line-height: 1.6;
+            font-family: 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-            color: #333;
+            padding: 0;
+            background: linear-gradient(135deg, #e0e7ff 0%, #f9fafb 100%);
+            color: #222;
+            min-height: 100vh;
         }
         .container {
-            max-width: 800px;
-            margin: 0 auto;
+            max-width: 700px;
+            margin: 40px auto 0 auto;
             background: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 36px 28px 32px 28px;
+            border-radius: 18px;
+            box-shadow: 0 4px 32px 0 rgba(60, 72, 88, 0.12);
+            transition: box-shadow 0.2s;
+        }
+        .container:hover {
+            box-shadow: 0 8px 40px 0 rgba(60, 72, 88, 0.20);
         }
         h1 {
             text-align: center;
-            margin-bottom: 20px;
-            color: #333;
+            margin-bottom: 32px;
+            color: #3b82f6;
+            font-size: 2.4em;
+            letter-spacing: 2px;
         }
         ul {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
         li {
-            margin-bottom: 10px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
+            margin-bottom: 18px;
+            border-radius: 8px;
+            background: #f3f6fb;
+            box-shadow: 0 1px 4px rgba(60,72,88,0.03);
+            transition: background 0.2s, box-shadow 0.2s;
+            padding: 0;
         }
         li:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
+            margin-bottom: 0;
         }
         a {
-            text-decoration: none;
-            color: #007bff;
-            font-size: 1.1em;
+            display: block;
+            padding: 18px 26px;
+            font-size: 1.15em;
+            color: #2563eb;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: background 0.2s, color 0.2s;
         }
         a:hover {
-            text-decoration: underline;
+            background: linear-gradient(90deg, #dbeafe 0%, #f0fdf4 100%);
+            color: #1e293b;
+            text-decoration: none;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 16px 6px 18px 6px;
+            }
+            h1 {
+                font-size: 1.3em;
+            }
+            a {
+                font-size: 1em;
+                padding: 14px 10px;
+            }
+        }
+        footer {
+            width: 100%;
+            text-align: center;
+            padding: 28px 0 14px 0;
+            background: rgba(0,0,0,0.03);
+            margin-top: 48px;
+        }
+        .footer-icons {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .footer-icon img {
+            width: 32px;
+            height: 32px;
+            margin: 0;
+            vertical-align: middle;
+            filter: grayscale(0.2) brightness(0.92);
+            transition: filter 0.2s, transform 0.2s;
+        }
+        .footer-icon:hover img {
+            filter: none;
+            transform: scale(1.12) rotate(-7deg);
+        }
+        .footer-team {
+            margin-top: 10px;
+            font-size: 15px;
+            color: #555;
+        }
+        .footer-copy {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #aaa;
         }
     </style>
 </head>
 <body>
+  <header class="page-header">
+    <span class="header-title">工具页眉</span>
+  </header>
+  <style>
+    .page-header {
+      display: flex;
+      align-items: center;
+      background: #1976d2;
+      color: #fff;
+      padding: 12px 20px;
+      font-size: 1.2em;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .header-title {
+      font-weight: bold;
+      font-size: 1.1em;
+      letter-spacing: 1px;
+    }
+  </style>
     <div class="container">
         <h1>Available Tools</h1>
         <ul>
@@ -68,5 +151,32 @@
             <li><a href="/image-base64-converter">Image to Base64 / Base64 to Image</a></li>
         </ul>
     </div>
+    <footer id="footer">
+        <div class="footer-icons">
+          <a href="https://youtube.com/你的频道" target="_blank" title="YouTube" class="footer-icon">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg" alt="YouTube">
+          </a>
+          <a href="https://x.com/你的账号" target="_blank" title="X" class="footer-icon">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X">
+          </a>
+          <a href="https://discord.com/你的账号" target="_blank" title="discord" class="footer-icon">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/discord.svg" alt="discord">
+          </a>
+          <a href="https://instagram.com/你的账号" target="_blank" title="Instagram" class="footer-icon">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram">
+          </a>
+          <a href="https://github.com/akxxxxxxxxx9" target="_blank" title="GitHub" class="footer-icon">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="GitHub">
+          </a>
+          <a href="https://web.telegram.org/你的账号" target="_blank" title="telegram" class="footer-icon">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="telegram">
+          </a>
+        </div>
+        <div class="footer-team">
+          团队成员：SUOU AKI
+        </div>
+        <div class="footer-copy">
+          &copy; 2025 AKI | Powered by Cloudflare Workers
+        </div>
 </body>
 </html>
