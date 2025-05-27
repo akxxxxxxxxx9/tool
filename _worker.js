@@ -10,6 +10,7 @@ async function handleRequest(event) {
   const routes = {
     '/': '/tool/index.html', // Index page
     '/vps-fixed-argo': '/tool/vps-fixed-argo.html',
+    '/vps-fixed-argo.html': '/tool/vps-fixed-argo.html', // Explicitly handle .html extension
     '/container-nix-fixed-argo': '/tool/container-nix-fixed-argo.html',
     '/vps-temporary-argo': '/tool/vps-temporary-argo.html',
     '/container-nix-script': '/tool/container-nix-script.html',
