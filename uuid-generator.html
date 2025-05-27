@@ -129,7 +129,7 @@
             <h2>生成设置</h2>
             <div style="margin-bottom: 10px;">
                 <label for="idCount">数量:</label>
-                <input type="text" id="idCount" value="6" style="width: 40px;">
+                <input type="text" id="idCount" value="50" style="width: 40px;">
                 <button id="idGenBtn">生成</button>
                 <button id="idResetBtn" type="button">重置</button>
             </div>
@@ -147,7 +147,7 @@
 
     <script>
         document.getElementById('idGenBtn').onclick = function() {
-            var n = Math.max(1, Math.min(50, parseInt(document.getElementById('idCount').value) || 1));
+            var n = Math.max(1, Math.min(9999999999, parseInt(document.getElementById('idCount').value) || 1));
             var result = [];
             for (var i = 0; i < n; i++) {
                 var t = '';
