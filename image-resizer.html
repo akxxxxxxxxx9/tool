@@ -47,6 +47,11 @@
              display: inline-block;
              margin-right: 10px;
         }
+         input[type="number"].percentage {
+            width: 80px;
+            margin-right: 0;
+            display: inline-block;
+        }
         button {
             display: inline-block;
             background-color: #007bff;
@@ -151,12 +156,23 @@
         </div>
 
         <div class="form-group">
-            <label>desired new dimensions (pixels):</label>
+            <label>所需新尺寸:</label>
             <div class="input-group dimensions">
-                 <label for="newWidth">Width:</label>
-                 <input type="number" id="newWidth" value="300" min="1">
-                 <label for="newHeight">Height:</label>
-                 <input type="number" id="newHeight" value="200" min="1">
+                <div>
+                    <input type="radio" id="resizeByPixels" name="resizeMethod" value="pixels" checked>
+                    <label for="resizeByPixels">按像素:</label>
+                    <label for="newWidth">宽度:</label>
+                    <input type="number" id="newWidth" value="300" min="1"> px
+                    <label for="newHeight">高度:</label>
+                    <input type="number" id="newHeight" value="200" min="1"> px
+                </div>
+                <div style="margin-top: 10px;">
+                    <input type="radio" id="resizeByPercentage" name="resizeMethod" value="percentage">
+                    <label for="resizeByPercentage">按百分比:</label>
+                    <label for="newPercentage">百分比:</label>
+                    <input type="number" id="newPercentage" value="100" min="1" class="percentage"> %
+                </div>
+
             </div>
         </div>
 
@@ -175,8 +191,11 @@
 
     <script>
         const imageUpload = document.getElementById('imageUpload');
+        const resizeByPixelsRadio = document.getElementById('resizeByPixels');
+        const resizeByPercentageRadio = document.getElementById('resizeByPercentage');
         const newWidthInput = document.getElementById('newWidth');
         const newHeightInput = document.getElementById('newHeight');
+        const newPercentageInput = document.getElementById('newPercentage');
         const resizeButton = document.getElementById('resizeButton');
         const previewArea = document.getElementById('previewArea');
         const previewImage = document.getElementById('previewImage');
@@ -186,6 +205,22 @@
         let uploadedImage = null;
         let uploadedFileName = '';
         let uploadedFileType = '';
+
+        // Function to enable/disable inputs based on selected method
+        function updateInputStates() {
+            if (resizeByPixelsRadio.checked) {
+                newWidthInput.disabled = false;
+                newHeightInput.disabled = false;
+                newPercentageInput.disabled = true;
+            } else {
+                newWidthInput.disabled = true;
+                newHeightInput.disabled = true;
+                newPercentageInput.disabled = false;
+            }
+        }
+
+        resizeByPixelsRadio.addEventListener('change', updateInputStates);
+        resizeByPercentageRadio.addEventListener('change', updateInputStates);
 
         imageUpload.addEventListener('change', (event) => {
             const file = event.target.files[0];
@@ -205,6 +240,7 @@
                          // Set default dimensions to original or a reasonable size
                          newWidthInput.value = img.width;
                          newHeightInput.value = img.height;
+                         updateInputStates(); // Update input states after image load
                     };
                     img.onerror = () => {
                          statusDiv.textContent = '无法加载图片. 请确保文件是有效的图片格式.';
@@ -236,13 +272,25 @@
                 return;
             }
 
-            const newWidth = parseInt(newWidthInput.value);
-            const newHeight = parseInt(newHeightInput.value);
+            let newWidth, newHeight;
 
-            if (isNaN(newWidth) || newWidth <= 0 || isNaN(newHeight) || newHeight <= 0) {
-                statusDiv.textContent = '请输入有效的宽度和高度 (大于 0).';
-                statusDiv.className = 'error';
-                return;
+            if (resizeByPixelsRadio.checked) {
+                newWidth = parseInt(newWidthInput.value);
+                newHeight = parseInt(newHeightInput.value);
+                if (isNaN(newWidth) || newWidth <= 0 || isNaN(newHeight) || newHeight <= 0) {
+                    statusDiv.textContent = '请输入有效的宽度和高度 (大于 0).';
+                    statusDiv.className = 'error';
+                    return;
+                }
+            } else { // resizeByPercentageRadio.checked
+                const percentage = parseInt(newPercentageInput.value);
+                 if (isNaN(percentage) || percentage <= 0) {
+                    statusDiv.textContent = '请输入有效的百分比 (大于 0).';
+                    statusDiv.className = 'error';
+                    return;
+                 }
+                newWidth = uploadedImage.width * (percentage / 100);
+                newHeight = uploadedImage.height * (percentage / 100);
             }
 
             statusDiv.textContent = '正在调整尺寸...';
@@ -269,32 +317,5 @@
             statusDiv.textContent = '尺寸调整完成.';
         });
     </script>
-     <footer id="footer">
-        <div class="footer-icons">
-          <a href="https://youtube.com/你的频道" target="_blank" title="YouTube" class="footer-icon">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg" alt="YouTube">
-          </a>
-          <a href="https://x.com/你的账号" target="_blank" title="X" class="footer-icon">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X">
-          </a>
-          <a href="https://discord.com/你的账号" target="_blank" title="discord" class="footer-icon">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/discord.svg" alt="discord">
-          </a>
-          <a href="https://instagram.com/你的账号" target="_blank" title="Instagram" class="footer-icon">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram">
-          </a>
-          <a href="https://github.com/akxxxxxxxxx9" target="_blank" title="GitHub" class="footer-icon">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="GitHub">
-          </a>
-          <a href="https://web.telegram.org/你的账号" target="_blank" title="telegram" class="footer-icon">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="telegram">
-          </a>
-        </div>
-        <div class="footer-team">
-          团队成员：SUOU AKI
-        </div>
-        <div class="footer-copy">
-          &copy; 2025 AKI | Powered by Cloudflare Workers
-        </div>
 </body>
 </html>
