@@ -1,5 +1,3 @@
-import { getAssetFromKV } from '@cloudflare/kv-asset-handler';
-
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event));
 });
@@ -28,23 +26,22 @@ async function handleRequest(event) {
 
   // Check if the requested path matches a defined route
   if (routes[path]) {
-    // Construct the request for the static asset
-    const assetRequest = new Request(new URL(routes[path], event.request.url), event.request);
     try {
-      return await getAssetFromKV(event, {
-        mapRequestToAsset: req => new Request(req.url.replace(url.origin, new URL(routes[path], url.origin).origin))
-      });
-    } catch (e) {
-      // If the specific HTML file is not found, return a 404
-      return new Response('Tool Not Found', { status: 404 });
+      // Fetch the specific HTML file
+      const htmlResponse = await fetch(new URL(routes[path], event.request.url));
+
+      // If the file is found, return it
+      if (htmlResponse.ok) {
+        return htmlResponse;
+      } else {
+        // If the specific HTML file is not found (e.g., 404), return a 404
+        return new Response('Tool Not Found', { status: htmlResponse.status });
+      }
+    } catch (error) {
+      // Handle any network or fetch errors
+      return new Response('Error loading tool', { status: 500 });
     }
   }
-
-  // For any other path, attempt to serve as a static asset
-  try {
-    return await getAssetFromKV(event);
-  } catch (e) {
-    // If no route matches and it's not a static asset, return 404
-    return new Response('Not Found', { status: 404 });
-  }
+  // If no route matches, return 404
+  return new Response('Not Found', { status: 404 });
 }
