@@ -2,15 +2,15 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>图片转 Base64 / Base64 转图片 - AKI工具箱</title>
-    <link rel="icon" type="image/png" href="http://momo-1-img.ao1160301aila.workers.dev/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片转 favicon.ico 工具</title>
     <style>
-        html, body {
-            background: #f4f7fb;
+        body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
         }
         .container {
             margin: 32px auto 0 auto;
@@ -25,30 +25,15 @@
         }
         h1 {
             text-align: center;
-            font-size: 2.2em;
-            margin-bottom: 28px;
-            letter-spacing: 1px;
+            color: #333;
+            margin-bottom: 20px;
         }
-        h2 {
-             font-size: 1.8em;
-             margin-bottom: 20px;
-             border-bottom: 1px solid #eee;
-             padding-bottom: 10px;
-         }
         .section {
-            margin-bottom: 30px;
-        }
-        .section label {
-            margin-right: 16px;
-        }
-        .result {
-            margin-top: 22px;
-            font-size: 1.25em;
-            word-break: break-all;
             background: #fff;
-            border: 1px solid #eee;
-            padding: 14px;
-            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .btn {
             padding: 8px 28px;
@@ -62,252 +47,122 @@
         .btn:hover {
             background: #cce6ff;
         }
-         textarea {
-            width: 100%;
-            min-height: 150px;
-            font-size: 1.1em;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-            resize: vertical;
+        label {
+            margin-right: 10px;
         }
-         #imageToBase64Output {
-            word-break: break-all;
-            background: #fff;
-            border: 1px solid #eee;
-            padding: 14px;
-            border-radius: 6px;
-            max-height: 10em;
-            overflow-y: auto;
-            font-size: 1em;
-            line-height: 1.5;
-         }
-         #base64ToImageOutput img {
-             max-width: 100%;
-             height: auto;
-             margin-top: 10px;
-             border: 1px solid #ccc;
-             display: block; /* Ensure image doesn't add extra space below */
-         }
-         #base64ToImageOutput span {
-             color: red;
-         }
-         @media (max-width: 900px) {
-             .container {
-                 max-width: 99vw;
-                 padding: 18px 2vw 18px 2vw;
-             }
-         }
-         @media (max-width: 600px) {
-             .container {
-                 border-radius: 0;
-                 padding: 8px 0 8px 0;
-             }
-             h1 { font-size: 1.5em; }
-             h2 { font-size: 1.3em; }
-         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>图片转 Base64 / Base64 转图片</h1>
+        <h1>图片转 favicon.ico 工具</h1>
 
         <div class="section">
-            <h2>图片转 Base64</h2>
-            <p>选择图片文件或粘贴图片URL进行转换。</p>
-            <input type="file" id="imageToBase64Input" accept="image/*" style="margin-bottom: 8px;">
-            <br>
-            或 粘贴图片 URL: <input type="text" id="imageURLInput" placeholder="输入图片链接" style="width: calc(100% - 120px); margin-bottom: 8px; padding: 4px;">
-            <button class="btn" id="imageToBase64Btn">转换图片到 Base64</button>
-            <div id="imageToBase64Output" style="margin-top:10px;"></div>
-            <div style="margin-top: 8px;">
-                <button class="btn" id="copyBase64Btn">复制 Base64</button>
-                <button class="btn" id="imageToBase64ResetBtn" style="margin-left: 8px;">重置</button>
-                <button class="btn" id="saveBase64TxtBtn" style="margin-left: 8px;">保存 Base64 (TXT)</button>
-                <button class="btn" id="imageToBase64SwapBtn" style="margin-left: 8px;">互换</button>
-            </div>
+            <h2>使用说明</h2>
+            <p>1. 选择您要转换的图片文件 (支持多种格式，如 PNG, JPG 等)。</p>
+            <p>2. (可选) 调整缩放百分比来改变图片在 32x32 区域内的显示大小。</p>
+            <p>3. 点击“转换并预览”按钮。</p>
+            <p>4. 转换成功后，您将看到 32x32 像素的 favicon 预览。</p>
+            <p>5. 点击“保存为 favicon.ico”按钮下载生成的图标文件。</>
         </div>
 
         <div class="section">
-            <h2>Base64 转图片</h2>
-            <p>粘贴 Base64 字符串，或导入TXT文件，然后转换为图片。</p>
-            <textarea id="base64ToImageInput" rows="6" placeholder="粘贴 Base64 字符串"></textarea>
-            <input type="file" id="importBase64TxtInput" accept=".txt" style="margin-top: 8px; margin-right: 8px;">
-            <button class="btn" id="base64ToImageBtn">转换 Base64 到图片</button>
-
-            <div id="base64ToImageOutput" style="margin-top:10px; min-height: 40px;"></div>
-            <div style="margin-top: 8px;">
-                <button class="btn" id="saveImageBtn" style="display: none;">保存图片</button>
-                <button class="btn" id="base64ToImageResetBtn" style="margin-left: 8px;">重置</button>
-            </div>
+            <div style="font-weight:bold; font-size:1.18em; margin-bottom:10px;">图片转 favicon.ico</div>
+            <form id="icoForm" onsubmit="return false;">
+                <div style="margin-bottom:12px;">
+                    <input type="file" id="icoInput" accept="image/*" />
+                </div>
+                <label for="icoScaleInput">缩放%:</label>
+                <input type="number" id="icoScaleInput" value="100" min="1" max="1000" style="width:60px;">
+                <button type="button" class="btn" id="icoConvertBtn" style="margin-left: 10px;">转换并预览</button>
+                <button type="button" class="btn" id="icoSaveBtn" style="display:none;">保存为 favicon.ico</button>
+            </form>
+            <div id="icoPreview" style="margin-top:14px;"></div>
         </div>
-
     </div>
 
     <script>
-        // ---------图片转Base64 / Base64转图片功能--------- //
+        const icoInput = document.getElementById('icoInput');
+        const icoConvertBtn = document.getElementById('icoConvertBtn');
+        const icoSaveBtn = document.getElementById('icoSaveBtn');
+        const icoPreview = document.getElementById('icoPreview');
+        const icoScaleInput = document.getElementById('icoScaleInput');
+        let icoBlobUrl = '';
 
-        // 图片转 Base64
-        async function imageFileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (event) => resolve(event.target.result);
-                reader.onerror = (error) => reject(error);
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function imageURLToBase64(url) {
-            try {
-                const response = await fetch(url);
-                const blob = await response.blob();
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(blob);
-                });
-            } catch (error) {
-                console.error("Error fetching image from URL:", error);
-                return "Error fetching image from URL.";
+        icoConvertBtn.onclick = function() {
+            const file = icoInput.files[0];
+            if (!file) {
+                icoPreview.innerHTML = '<span style="color:red;">请先选择图片文件。</span>';
+                icoSaveBtn.style.display = 'none';
+                return;
             }
-        }
-
-        document.getElementById('imageToBase64Input').addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const base64String = await imageFileToBase64(file);
-                document.getElementById('imageToBase64Output').innerText = base64String;
-                 document.getElementById('imageURLInput').value = ''; // Clear URL input
-            } else {
-                document.getElementById('imageToBase64Output').innerText = '';
-            }
-        });
-
-        document.getElementById('imageToBase64Btn').onclick = async function() {
-            const imageUrl = document.getElementById('imageURLInput').value.trim();
-            if (imageUrl) {
-                const base64String = await imageURLToBase64(imageUrl);
-                document.getElementById('imageToBase64Output').innerText = base64String;
-                 document.getElementById('imageToBase64Input').value = ''; // Clear file input
-            } else {
-                document.getElementById('imageToBase64Output').innerText = '请选择图片文件或粘贴图片URL';
-            }
-        };
-
-        document.getElementById('copyBase64Btn').onclick = function() {
-            const output = document.getElementById('imageToBase64Output').innerText;
-             if (output) {
-                navigator.clipboard.writeText(output).then(() => {
-                    alert('已复制 Base64 字符串');
-                }).catch(err => {
-                    console.error('复制失败:', err);
-                    alert('复制失败，请手动复制');
-                });
-             } else {
-                 alert('没有可复制的 Base64 字符串');
-             }
-        };
-
-        // 保存 Base64 (TXT)
-        document.getElementById('saveBase64TxtBtn').onclick = function() {
-            const output = document.getElementById('imageToBase64Output').innerText;
-            if (output) {
-                const blob = new Blob([output], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'base64_output.txt'; // Or infer format from base64? No, always txt
-                a.click();
-                setTimeout(() => URL.revokeObjectURL(url), 1000);
-            }
-        };
-
-        document.getElementById('imageToBase64ResetBtn').onclick = function() {
-            document.getElementById('imageToBase64Input').value = '';
-            document.getElementById('imageURLInput').value = '';
-            document.getElementById('imageToBase64Output').innerText = '';
-             document.getElementById('base64ToImageOutput').innerHTML = ''; // Reset related image output
-             document.getElementById('saveImageBtn').style.display = 'none';
-        };
-
-        // Base64 转图片
-        // 导入 Base64 (TXT) 功能
-        document.getElementById('importBase64TxtInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    document.getElementById('base64ToImageInput').value = event.target.result;
-                    // Optionally auto-convert after loading
-                    // document.getElementById('base64ToImageBtn').click();
-                };
-                reader.onerror = function(error) {
-                    console.error("Error reading file:", error);
-                    alert("无法读取文件。");
-                };
-                reader.readAsText(file);
-            }
-        });
-
-        document.getElementById('base64ToImageBtn').onclick = function() {
-            const base64String = document.getElementById('base64ToImageInput').value.trim();
-            const outputDiv = document.getElementById('base64ToImageOutput');
-            const saveBtn = document.getElementById('saveImageBtn');
-            outputDiv.innerHTML = ''; // Clear previous output
-            saveBtn.style.display = 'none'; // Hide save button initially
-            if (base64String) {
+            const scale = Math.max(1, Math.min(100, parseInt(icoScaleInput.value) || 100)); // Clamp scale between 1 and 100
+            const reader = new FileReader();
+            reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
-                    outputDiv.appendChild(img);
-                    saveBtn.style.display = '';
-                    saveBtn.onclick = function() {
-                        const a = document.createElement('a');
-                        a.href = img.src;
-                        // Try to infer format, default to png
-                         let format = 'png';
-                         if (img.src.startsWith('data:image/jpeg')) format = 'jpeg';
-                         if (img.src.startsWith('data:image/gif')) format = 'gif';
-                         if (img.src.startsWith('data:image/webp')) format = 'webp';
-                        a.download = 'converted_image.' + format;
-                        a.click();
-                    };
+                    // 画布缩放为32x32，支持自定义缩放比例
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 32;
+                    canvas.height = 32;
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, 32, 32);
+                    // 计算目标宽高
+                    const targetW = Math.round(32 * scale / 100);
+                    const targetH = Math.round(32 * scale / 100);
+                    const offsetX = Math.floor((32 - targetW) / 2);
+                    const offsetY = Math.floor((32 - targetH) / 2);
+                    ctx.drawImage(img, offsetX, offsetY, targetW, targetH);
+                    // 获取png数据
+                    canvas.toBlob(function(pngBlob) {
+                        // 生成ico文件头（简单单图标实现）
+                        const reader2 = new FileReader();
+                        reader2.onload = function(ev) {
+                            const pngArray = new Uint8Array(ev.target.result);
+                            // ICO header
+                            const icoHeader = new Uint8Array([
+                                0x00,0x00, // Reserved
+                                0x01,0x00, // Image type: icon
+                                0x01,0x00, // Number of images
+                                0x20, // width (32)
+                                0x20, // height (32)
+                                0x00, // color count (0 for 24/32 bit)
+                                0x00, // reserved
+                                0x01,0x00, // color planes
+                                0x20,0x00, // bits per pixel (32)
+                                pngArray.length & 0xFF, (pngArray.length >> 8) & 0xFF, (pngArray.length >> 16) & 0xFF, (pngArray.length >> 24) & 0xFF, // size of PNG data
+                                22,0x00,0x00,0x00 // offset to PNG data (22 bytes header)
+                            ]);
+                            // 拼接ico数据
+                            const icoArr = new Uint8Array(icoHeader.length + pngArray.length);
+                            icoArr.set(icoHeader, 0);
+                            icoArr.set(pngArray, icoHeader.length);
+                            const icoBlob = new Blob([icoArr], {type: 'image/x-icon'});
+                            if (icoBlobUrl) URL.revokeObjectURL(icoBlobUrl);
+                            icoBlobUrl = URL.createObjectURL(icoBlob);
+                            icoPreview.innerHTML = '<img src="' + icoBlobUrl + '" style="width:32px;height:32px;border:1px solid #ccc;">';
+                            icoSaveBtn.style.display = '';
+                            icoSaveBtn.onclick = function() {
+                                const a = document.createElement('a');
+                                a.href = icoBlobUrl;
+                                a.download = 'favicon.ico';
+                                a.click();
+                            };
+                        };
+                        reader2.readAsArrayBuffer(pngBlob);
+                    }, 'image/png');
                 };
                 img.onerror = function() {
-                    outputDiv.innerHTML = '<span style="color:red;">无效的 Base64 字符串或图片加载失败。</span>';
+                    icoPreview.innerHTML = '<span style="color:red;">图片加载失败。</span>';
+                    icoSaveBtn.style.display = 'none';
                 };
-                img.src = base64String;
-            } else {
-                outputDiv.innerHTML = '<span style="color:red;">请输入 Base64 字符串。</span>';
-            }
-        };
-
-        document.getElementById('base64ToImageResetBtn').onclick = function() {
-            document.getElementById('base64ToImageInput').value = '';
-            document.getElementById('base64ToImageOutput').innerHTML = '';
-            document.getElementById('saveImageBtn').style.display = 'none';
-             document.getElementById('importBase64TxtInput').value = ''; // Reset file input as well
-        };
-
-        // 图片转Base64 / Base64转图片互换
-         if (document.getElementById('imageToBase64SwapBtn')) {
-            document.getElementById('imageToBase64SwapBtn').onclick = function() {
-                const base64Output = document.getElementById('imageToBase64Output');
-                const base64Input = document.getElementById('base64ToImageInput');
-                // Swap content
-                const temp = base64Output.innerText;
-                base64Output.innerText = base64Input.value;
-                base64Input.value = temp;
-                // Reset file/url inputs and image output after swap
-                document.getElementById('imageToBase64Input').value = '';
-                document.getElementById('imageURLInput').value = '';
-                document.getElementById('base64ToImageOutput').innerHTML = '';
-                document.getElementById('saveImageBtn').style.display = 'none';
-                 document.getElementById('importBase64TxtInput').value = '';
+                img.src = e.target.result;
             };
-         }
-
+            reader.onerror = function() {
+                icoPreview.innerHTML = '<span style="color:red;">文件读取失败。</span>';
+                icoSaveBtn.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        };
     </script>
 </body>
 </html>
