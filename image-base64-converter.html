@@ -2,186 +2,414 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>图片转 Base64 / Base64 转图片 - AKI工具箱</title>
     <link rel="icon" type="image/png" href="http://momo-1-img.ao1160301aila.workers.dev/favicon.ico">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/all.min.css">
     <style>
-        html, body {
-            background: #f4f7fb;
-            font-family: Arial, sans-serif;
+        :root {
+            --primary-color: #1976d2;
+            --secondary-color: #e6f2ff;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
             margin: 0;
             padding: 0;
-            min-height: 100vh;
-        }
-        .container {
-            margin: 32px auto 0 auto;
-            max-width: 1440px;
-            width: 95vw;
-            background: #f8fcff;
-            border: 1px solid #cce;
-            border-radius: 12px;
-            padding: 32px 5vw 32px 5vw;
             box-sizing: border-box;
-            box-shadow: 0 2px 16px 0 rgba(180,200,230,0.07);
         }
+
+        body {
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f4f7fb, #e8eff7);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            background: var(--primary-color);
+            color: #fff;
+            padding: 15px 20px;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1em;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        /* 主容器 */
+        .main-container {
+            display: flex;
+            max-width: 1440px;
+            margin: 20px auto;
+            gap: 20px;
+            padding: 0 20px;
+            flex: 1;
+        }
+
+        .content {
+            flex: 3;
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            flex: 1;
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: none;
+        }
+
+        .sidebar h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar ul li a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .sidebar ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        /* 内容样式 */
         h1 {
             text-align: center;
-            font-size: 2.2em;
-            margin-bottom: 28px;
-            letter-spacing: 1px;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: var(--primary-color);
         }
+
         h2 {
-             font-size: 1.8em;
-             margin-bottom: 20px;
-             border-bottom: 1px solid #eee;
-             padding-bottom: 10px;
-         }
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
         .section {
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: var(--secondary-color);
+            border-radius: 8px;
+            transition: transform 0.3s;
         }
-        .section label {
-            margin-right: 16px;
+
+        .section:hover {
+            transform: translateY(-5px);
         }
-        .result {
-            margin-top: 22px;
-            font-size: 1.25em;
-            word-break: break-all;
-            background: #fff;
-            border: 1px solid #eee;
-            padding: 14px;
-            border-radius: 6px;
+
+        .input-group {
+            margin-bottom: 15px;
         }
-        .btn {
-            padding: 8px 28px;
-            font-size: 1.08em;
-            border: 1px solid #0077cc;
-            background: #e6f2ff;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
         }
-        .btn:hover {
-            background: #cce6ff;
-        }
-         textarea {
+
+        input[type="file"],
+        input[type="text"],
+        textarea {
             width: 100%;
-            min-height: 150px;
-            font-size: 1.1em;
             padding: 10px;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-            resize: vertical;
-        }
-         #imageToBase64Output {
-            word-break: break-all;
-            background: #fff;
-            border: 1px solid #eee;
-            padding: 14px;
-            border-radius: 6px;
-            max-height: 10em;
-            overflow-y: auto;
             font-size: 1em;
-            line-height: 1.5;
-         }
-         #base64ToImageOutput img {
-             max-width: 100%;
-             height: auto;
-             margin-top: 10px;
-             border: 1px solid #ccc;
-             display: block; /* Ensure image doesn't add extra space below */
-         }
-         #base64ToImageOutput span {
-             color: red;
-         }
-         @media (max-width: 900px) {
-             .container {
-                 max-width: 99vw;
-                 padding: 18px 2vw 18px 2vw;
-             }
-         }
-         @media (max-width: 600px) {
-             .container {
-                 border-radius: 0;
-                 padding: 8px 0 8px 0;
-             }
-             h1 { font-size: 1.5em; }
-             h2 { font-size: 1.3em; }
-         }
+            transition: border-color 0.3s;
+        }
+
+        input[type="file"]:focus,
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            background: var(--primary-color);
+            color: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            background: #1565c0;
+            transform: scale(1.05);
+        }
+
+        .output {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95em;
+            max-height: 200px;
+            overflow-y: auto;
+            word-break: break-all;
+        }
+
+        #base64ToImageOutput img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        #base64ToImageOutput span {
+            color: #d32f2f;
+        }
+
+        /* 页脚 */
+        footer {
+            background: var(--primary-color);
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        .footer-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .footer-icon img {
+            width: 24px;
+            height: 24px;
+            filter: invert(1);
+            transition: transform 0.3s;
+        }
+
+        .footer-icon img:hover {
+            transform: scale(1.2);
+        }
+
+        .footer-team,
+        .footer-copy {
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 900px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                display: block;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .navbar .container {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            h2 {
+                font-size: 1.4em;
+            }
+
+            .content {
+                padding: 15px;
+            }
+        }
     </style>
 </head>
 <body>
-  <header class="page-header">
-    <a class="back-home" href="index.html">返回主页</a>
-    <span class="header-title">工具页眉</span>
-  </header>
-  <style>
-    .page-header {
-      display: flex;
-      align-items: center;
-      background: #1976d2;
-      color: #fff;
-      padding: 12px 20px;
-      font-size: 1.2em;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-    .back-home {
-      color: #fff;
-      background: #1565c0;
-      border-radius: 4px;
-      padding: 5px 12px;
-      text-decoration: none;
-      margin-right: 18px;
-      font-weight: bold;
-      transition: background 0.2s;
-    }
-    .back-home:hover {
-      background: #0d47a1;
-    }
-    .header-title {
-      font-weight: bold;
-      font-size: 1.1em;
-      letter-spacing: 1px;
-    }
-  </style>
-    <div class="container">
-        <h1>图片转 Base64 / Base64 转图片</h1>
-
-        <div class="section">
-            <h2>图片转 Base64</h2>
-            <p>选择图片文件或粘贴图片URL进行转换。</p>
-            <input type="file" id="imageToBase64Input" accept="image/*" style="margin-bottom: 8px;">
-            <br>
-            或 粘贴图片 URL: <input type="text" id="imageURLInput" placeholder="输入图片链接" style="width: calc(100% - 120px); margin-bottom: 8px; padding: 4px;">
-            <button class="btn" id="imageToBase64Btn">转换图片到 Base64</button>
-            <div id="imageToBase64Output" style="margin-top:10px;"></div>
-            <div style="margin-top: 8px;">
-                <button class="btn" id="copyBase64Btn">复制 Base64</button>
-                <button class="btn" id="imageToBase64ResetBtn" style="margin-left: 8px;">重置</button>
-                <button class="btn" id="saveBase64TxtBtn" style="margin-left: 8px;">保存 Base64 (TXT)</button>
-                <button class="btn" id="imageToBase64SwapBtn" style="margin-left: 8px;">互换</button>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">AKI工具箱</a>
+            <div class="nav-links">
+                <a href="/index.html">首页</a>
+                <a href="https://tool.996399.xyz">工具</a>
+                <a href="https://dir.momobako.me">关于</a>
+                <a href="https://github.com/akxxxxxxxxx9">联系</a>
             </div>
         </div>
+    </nav>
 
-        <div class="section">
-            <h2>Base64 转图片</h2>
-            <p>粘贴 Base64 字符串，或导入TXT文件，然后转换为图片。</p>
-            <textarea id="base64ToImageInput" rows="6" placeholder="粘贴 Base64 字符串"></textarea>
-            <input type="file" id="importBase64TxtInput" accept=".txt" style="margin-top: 8px; margin-right: 8px;">
-            <button class="btn" id="base64ToImageBtn">转换 Base64 到图片</button>
+    <!-- 主内容 -->
+    <div class="main-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <h3>其他工具</h3>
+            <ul>
+                <li><a href="#json-format">JSON 格式化</a></li>
+                <li><a href="#url-encode">URL 编码/解码</a></li>
+                <li><a href="#color-picker">颜色选择器</a></li>
+                <li><a href="#qr-code">二维码生成</a></li>
+            </ul>
+            <h3>快速链接</h3>
+            <ul>
+                <li><a href="#docs">文档</a></li>
+                <li><a href="#faq">常见问题</a></li>
+                <li><a href="#support">技术支持</a></li>
+            </ul>
+        </aside>
 
-            <div id="base64ToImageOutput" style="margin-top:10px; min-height: 40px;"></div>
-            <div style="margin-top: 8px;">
-                <button class="btn" id="saveImageBtn" style="display: none;">保存图片</button>
-                <button class="btn" id="base64ToImageResetBtn" style="margin-left: 8px;">重置</button>
+        <!-- 主要内容 -->
+        <div class="content">
+            <h1>图片转 Base64 / Base64 转图片</h1>
+
+            <div class="section">
+                <h2>图片转 Base64</h2>
+                <p>将图片文件或URL转换为 Base64 编码，方便嵌入网页或分享。</p>
+                <div class="input-group">
+                    <label for="imageToBase64Input">选择图片文件</label>
+                    <input type="file" id="imageToBase64Input" accept="image/*">
+                </div>
+                <div class="input-group">
+                    <label for="imageURLInput">或输入图片 URL</label>
+                    <input type="text" id="imageURLInput" placeholder="输入图片链接">
+                </div>
+                <button class="btn" id="imageToBase64Btn">转换图片到 Base64</button>
+                <div class="output" id="imageToBase64Output"></div>
+                <div class="input-group">
+                    <button class="btn" id="copyBase64Btn">复制 Base64</button>
+                    <button class="btn" id="saveBase64TxtBtn">保存为 TXT</button>
+                    <button class="btn" id="imageToBase64SwapBtn">互换</button>
+                    <button class="btn" id="imageToBase64ResetBtn">重置</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Base64 转图片</h2>
+                <p>将 Base64 字符串转换为图片，支持从文本文件导入。</p>
+                <div class="input-group">
+                    <label for="base64ToImageInput">粘贴 Base64 字符串</label>
+                    <textarea id="base64ToImageInput" placeholder="粘贴 Base64 字符串"></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="importBase64TxtInput">或导入 TXT 文件</label>
+                    <input type="file" id="importBase64TxtInput" accept=".txt">
+                </div>
+                <button class="btn" id="base64ToImageBtn">转换为图片</button>
+                <div class="output" id="base64ToImageOutput"></div>
+                <div class="input-group">
+                    <button class="btn" id="saveImageBtn" style="display: none;">保存图片</button>
+                    <button class="btn" id="base64ToImageResetBtn">重置</button>
+                </div>
             </div>
         </div>
-
     </div>
 
-    <script>
-        // ---------图片转Base64 / Base64转图片功能--------- //
+    <!-- 页脚 -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-icons">
+                <a href="https://youtube.com/你的频道" target="_blank" title="YouTube" class="footer-icon">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg" alt="YouTube">
+                </a>
+                <a href="https://x.com/你的账号" target="_blank" title="X" class="footer-icon">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X">
+                </a>
+                <a href="https://discord.com/你的账号" target="_blank" title="Discord" class="footer-icon">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/discord.svg" alt="Discord">
+                </a>
+                <a href="https://instagram.com/你的账号" target="_blank" title="Instagram" class="footer-icon">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram">
+                </a>
+                <a href="https://github.com/akxxxxxxxxx9" target="_blank" title="GitHub" class="footer-icon">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="GitHub">
+                </a>
+                <a href="https://web.telegram.org/你的账号" target="_blank" title="Telegram" class="footer-icon">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="Telegram">
+                </a>
+            </div>
+            <div class="footer-team">团队成员：SUOU AKI</div>
+            <div class="footer-copy">© 2025 AKI工具箱 | Powered by Cloudflare Workers</div>
+        </div>
+    </footer>
 
-        // 图片转 Base64
+    <script>
+        // 保留原有 JavaScript 功能
         async function imageFileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -194,6 +422,7 @@
         async function imageURLToBase64(url) {
             try {
                 const response = await fetch(url);
+                if (!response.ok) throw new Error('Network response was not ok');
                 const blob = await response.blob();
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -203,7 +432,7 @@
                 });
             } catch (error) {
                 console.error("Error fetching image from URL:", error);
-                return "Error fetching image from URL.";
+                return "无法从 URL 获取图片。";
             }
         }
 
@@ -212,7 +441,7 @@
             if (file) {
                 const base64String = await imageFileToBase64(file);
                 document.getElementById('imageToBase64Output').innerText = base64String;
-                 document.getElementById('imageURLInput').value = ''; // Clear URL input
+                document.getElementById('imageURLInput').value = '';
             } else {
                 document.getElementById('imageToBase64Output').innerText = '';
             }
@@ -223,27 +452,26 @@
             if (imageUrl) {
                 const base64String = await imageURLToBase64(imageUrl);
                 document.getElementById('imageToBase64Output').innerText = base64String;
-                 document.getElementById('imageToBase64Input').value = ''; // Clear file input
+                document.getElementById('imageToBase64Input').value = '';
             } else {
-                document.getElementById('imageToBase64Output').innerText = '请选择图片文件或粘贴图片URL';
+                document.getElementById('imageToBase64Output').innerText = '请选择图片文件或输入图片 URL';
             }
         };
 
         document.getElementById('copyBase64Btn').onclick = function() {
             const output = document.getElementById('imageToBase64Output').innerText;
-             if (output) {
+            if (output) {
                 navigator.clipboard.writeText(output).then(() => {
                     alert('已复制 Base64 字符串');
                 }).catch(err => {
                     console.error('复制失败:', err);
                     alert('复制失败，请手动复制');
                 });
-             } else {
-                 alert('没有可复制的 Base64 字符串');
-             }
+            } else {
+                alert('没有可复制的 Base64 字符串');
+            }
         };
 
-        // 保存 Base64 (TXT)
         document.getElementById('saveBase64TxtBtn').onclick = function() {
             const output = document.getElementById('imageToBase64Output').innerText;
             if (output) {
@@ -251,7 +479,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'base64_output.txt'; // Or infer format from base64? No, always txt
+                a.download = 'base64_output.txt';
                 a.click();
                 setTimeout(() => URL.revokeObjectURL(url), 1000);
             }
@@ -261,20 +489,16 @@
             document.getElementById('imageToBase64Input').value = '';
             document.getElementById('imageURLInput').value = '';
             document.getElementById('imageToBase64Output').innerText = '';
-             document.getElementById('base64ToImageOutput').innerHTML = ''; // Reset related image output
-             document.getElementById('saveImageBtn').style.display = 'none';
+            document.getElementById('base64ToImageOutput').innerHTML = '';
+            document.getElementById('saveImageBtn').style.display = 'none';
         };
 
-        // Base64 转图片
-        // 导入 Base64 (TXT) 功能
         document.getElementById('importBase64TxtInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     document.getElementById('base64ToImageInput').value = event.target.result;
-                    // Optionally auto-convert after loading
-                    // document.getElementById('base64ToImageBtn').click();
                 };
                 reader.onerror = function(error) {
                     console.error("Error reading file:", error);
@@ -288,8 +512,8 @@
             const base64String = document.getElementById('base64ToImageInput').value.trim();
             const outputDiv = document.getElementById('base64ToImageOutput');
             const saveBtn = document.getElementById('saveImageBtn');
-            outputDiv.innerHTML = ''; // Clear previous output
-            saveBtn.style.display = 'none'; // Hide save button initially
+            outputDiv.innerHTML = '';
+            saveBtn.style.display = 'none';
             if (base64String) {
                 const img = new Image();
                 img.onload = function() {
@@ -298,21 +522,20 @@
                     saveBtn.onclick = function() {
                         const a = document.createElement('a');
                         a.href = img.src;
-                        // Try to infer format, default to png
-                         let format = 'png';
-                         if (img.src.startsWith('data:image/jpeg')) format = 'jpeg';
-                         if (img.src.startsWith('data:image/gif')) format = 'gif';
-                         if (img.src.startsWith('data:image/webp')) format = 'webp';
+                        let format = 'png';
+                        if (img.src.startsWith('data:image/jpeg')) format = 'jpeg';
+                        if (img.src.startsWith('data:image/gif')) format = 'gif';
+                        if (img.src.startsWith('data:image/webp')) format = 'webp';
                         a.download = 'converted_image.' + format;
                         a.click();
                     };
                 };
                 img.onerror = function() {
-                    outputDiv.innerHTML = '<span style="color:red;">无效的 Base64 字符串或图片加载失败。</span>';
+                    outputDiv.innerHTML = '<span>无效的 Base64 字符串或图片加载失败。</span>';
                 };
                 img.src = base64String;
             } else {
-                outputDiv.innerHTML = '<span style="color:red;">请输入 Base64 字符串。</span>';
+                outputDiv.innerHTML = '<span>请输入 Base64 字符串。</span>';
             }
         };
 
@@ -320,54 +543,21 @@
             document.getElementById('base64ToImageInput').value = '';
             document.getElementById('base64ToImageOutput').innerHTML = '';
             document.getElementById('saveImageBtn').style.display = 'none';
-             document.getElementById('importBase64TxtInput').value = ''; // Reset file input as well
+            document.getElementById('importBase64TxtInput').value = '';
         };
 
-        // 图片转Base64 / Base64转图片互换
-         if (document.getElementById('imageToBase64SwapBtn')) {
-            document.getElementById('imageToBase64SwapBtn').onclick = function() {
-                const base64Output = document.getElementById('imageToBase64Output');
-                const base64Input = document.getElementById('base64ToImageInput');
-                // Swap content
-                const temp = base64Output.innerText;
-                base64Output.innerText = base64Input.value;
-                base64Input.value = temp;
-                // Reset file/url inputs and image output after swap
-                document.getElementById('imageToBase64Input').value = '';
-                document.getElementById('imageURLInput').value = '';
-                document.getElementById('base64ToImageOutput').innerHTML = '';
-                document.getElementById('saveImageBtn').style.display = 'none';
-                 document.getElementById('importBase64TxtInput').value = '';
-            };
-         }
-
+        document.getElementById('imageToBase64SwapBtn').onclick = function() {
+            const base64Output = document.getElementById('imageToBase64Output');
+            const base64Input = document.getElementById('base64ToImageInput');
+            const temp = base64Output.innerText;
+            base64Output.innerText = base64Input.value;
+            base64Input.value = temp;
+            document.getElementById('imageToBase64Input').value = '';
+            document.getElementById('imageURLInput').value = '';
+            document.getElementById('base64ToImageOutput').innerHTML = '';
+            document.getElementById('saveImageBtn').style.display = 'none';
+            document.getElementById('importBase64TxtInput').value = '';
+        };
     </script>
-     <footer id="footer">
-        <div class="footer-icons">
-          <a href="https://youtube.com/你的频道" target="_blank" title="YouTube" class="footer-icon">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg" alt="YouTube">
-          </a>
-          <a href="https://x.com/你的账号" target="_blank" title="X" class="footer-icon">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X">
-          </a>
-          <a href="https://discord.com/你的账号" target="_blank" title="discord" class="footer-icon">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/discord.svg" alt="discord">
-          </a>
-          <a href="https://instagram.com/你的账号" target="_blank" title="Instagram" class="footer-icon">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram">
-          </a>
-          <a href="https://github.com/akxxxxxxxxx9" target="_blank" title="GitHub" class="footer-icon">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="GitHub">
-          </a>
-          <a href="https://web.telegram.org/你的账号" target="_blank" title="telegram" class="footer-icon">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="telegram">
-          </a>
-        </div>
-        <div class="footer-team">
-          团队成员：SUOU AKI
-        </div>
-        <div class="footer-copy">
-          &copy; 2025 AKI | Powered by Cloudflare Workers
-        </div>
 </body>
 </html>
