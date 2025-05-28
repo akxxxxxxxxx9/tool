@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>柱状图生成器 - AKI工具箱</title>
+    <link rel="icon" type="image/png" href="http://momo-1-img.ao1160301aila.workers.dev/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html, body {
+            background: linear-gradient(135deg, #e0e7ff, #f4f7fb);
+            font-family: 'Poppins', 'PingFang SC', Arial, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: #fff;
+            padding: 16px 32px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .back-home {
+            color: #fff;
+            background: #1e40af;
+            border-radius: 8px;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .back-home:hover {
+            background: #1e3a8a;
+            transform: translateY(-2px);
+        }
+        .header-title {
+            font-weight: 600;
+            font-size: 1.4em;
+            letter-spacing: 0.5px;
+        }
+        .container {
+            margin: 40px auto;
+            max-width: 1000px;
+            width: 95vw;
+            background: #fff;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .container:hover {
+            transform: translateY(-4px);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.6em;
+            color: #1f2937;
+            margin-bottom: 20px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .section {
+            margin-bottom: 32px;
+        }
+        .btn {
+            padding: 12px 24px;
+            font-size: 1em;
+            font-weight: 500;
+            border: none;
+            background: #3b82f6;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+        .input-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            font-size: 0.95em;
+            color: #4b5563;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .bar-row:hover {
+            background: #f1f5f9;
+        }
+        .bar-label, .bar-value, .settings-panel input[type="text"],
+        .settings-panel input[type="number"], .settings-panel select {
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.95em;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+        .bar-label:focus, .bar-value:focus, .settings-panel input:focus, .settings-panel select:focus {
+            border-color: #3b82f6;
+            outline: none;
+        }
+        .bar-color {
+            width: 50px;
+            height: 40px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .bar-remove, .bar-up, .bar-down {
+            padding: 8px 12px;
+            font-size: 0.9em;
+        }
+        #barPreview canvas {
+            display: block;
+            margin: 32px auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        #barPreview canvas:hover {
+            transform: scale(1.02);
+        }
+        .settings-panel {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+        }
+        .error {
+            color: #dc2626;
+            font-size: 0.9em;
+            margin-top: 12px;
+            text-align: center;
+        }
+        footer {
+            text-align: center;
+            padding: 32px 0;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: #fff;
+            margin-top: 48px;
+        }
+        .footer-icon img {
+            width: 36px;
+            height: 36px;
+            margin: 0 16px;
+            transition: transform 0.3s;
+        }
+        .footer-icon img:hover {
+            transform: scale(1.15);
+        }
+        .footer-text {
+            font-size: 0.95em;
+            margin-top: 12px;
+            opacity: 0.9;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .bar-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .bar-label, .bar-value, .bar-color {
+                width: 100%;
+            }
+            .input-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <a class="back-home" href="index.html">返回主页</a>
+        <span class="header-title">AKI工具箱 - 柱状图生成器</span>
+    </header>
+
+    <div class="container">
+        <h1>柱状图生成器</h1>
+
+        <div class="section settings-panel">
+            <h2 style="font-size: 1.3em; margin-bottom: 20px; color: #1f2937;">图表设置</h2>
+            <div class="input-group">
+                <div>
+                    <label>图表标题</label>
+                    <input type="text" id="chartTitle" placeholder="输入图表标题">
+                </div>
+                <div>
+                    <label>图表宽度（像素）</label>
+                    <input type="number" id="chartWidth" value="600" min="300" max="1000">
+                </div>
+                <div>
+                    <label>图表高度（像素）</label>
+                    <input type="number" id="chartHeight" value="400" min="200" max="800">
+                </div>
+                <div>
+                    <label>比例单位</label>
+                    <select id="unitType">
+                        <option value="percent">百分比（总和需为100%）</option>
+                        <option value="absolute">任意正数（自动计算百分比）</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <p style="color: #4b5563; margin-bottom: 16px;">输入每个类别的名称、比例和颜色。</p>
+            <form id="barForm" onsubmit="return false;">
+                <div id="barInputs"></div>
+                <div class="input-group">
+                    <button type="button" class="btn" id="barAddBtn">添加类别</button>
+                    <button type="button" class="btn" id="barGenBtn">生成柱状图</button>
+                    <button type="button" class="btn" id="barSaveBtn" style="display: none;">保存图片</button>
+                </div>
+            </form>
+            <div id="barPreview"></div>
+            <div id="errorMsg" class="error"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div>
+            <a href="https://youtube.com/你的频道" target="_blank" title="YouTube" class="footer-icon">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg" alt="YouTube">
+            </a>
+            <a href="https://x.com/你的账号" target="_blank" title="X" class="footer-icon">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X">
+            </a>
+            <a href="https://discord.com/你的账号" target="_blank" title="Discord" class="footer-icon">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/discord.svg" alt="Discord">
+            </a>
+            <a href="https://instagram.com/你的账号" target="_blank" title="Instagram" class="footer-icon">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram">
+            </a>
+            <a href="https://github.com/akxxxxxxxxx9" target="_blank" title="GitHub" class="footer-icon">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="GitHub">
+            </a>
+            <a href="https://web.telegram.org/你的账号" target="_blank" title="Telegram" class="footer-icon">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="Telegram">
+            </a>
+        </div>
+        <div class="footer-text">团队成员：SUOU AKI</div>
+        <div class="footer-text">© 2025 AKI | Powered by Cloudflare Workers</div>
+    </footer>
+
+    <script>
+        (function() {
+            const barInputs = document.getElementById('barInputs');
+            const barAddBtn = document.getElementById('barAddBtn');
+            const barGenBtn = document.getElementById('barGenBtn');
+            const barSaveBtn = document.getElementById('barSaveBtn');
+            const barPreview = document.getElementById('barPreview');
+            const errorMsg = document.getElementById('errorMsg');
+            const chartTitleInput = document.getElementById('chartTitle');
+            const chartWidthInput = document.getElementById('chartWidth');
+            const chartHeightInput = document.getElementById('chartHeight');
+            const unitTypeSelect = document.getElementById('unitType');
+
+            // 默认颜色列表，与饼图一致
+            const defaultColors = ['#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316', '#6b7280', '#84cc16'];
+
+            function addBarRow(label = '', value = '', color = '', canRemove = true) {
+                const row = document.createElement('div');
+                row.className = 'bar-row';
+                const labelInput = document.createElement('input');
+                labelInput.type = 'text';
+                labelInput.className = 'bar-label';
+                labelInput.placeholder = '类别';
+                labelInput.value = label;
+                const valueInput = document.createElement('input');
+                valueInput.type = 'number';
+                valueInput.className = 'bar-value';
+                valueInput.placeholder = unitTypeSelect.value === 'percent' ? '比例（百分比）' : '比例（任意正数）';
+                valueInput.min = '0';
+                valueInput.step = '0.01';
+                valueInput.value = value;
+                const colorInput = document.createElement('input');
+                colorInput.type = 'color';
+                colorInput.className = 'bar-color';
+                colorInput.value = color || defaultColors[barInputs.children.length % defaultColors.length];
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'btn bar-remove';
+                removeBtn.textContent = '删除';
+                removeBtn.style.display = canRemove ? '' : 'none';
+                removeBtn.onclick = function() {
+                    barInputs.removeChild(row);
+                    if (barInputs.children.length === 1) {
+                        barInputs.children[0].querySelector('.bar-remove').style.display = 'none';
+                    }
+                };
+                const upBtn = document.createElement('button');
+                upBtn.type = 'button';
+                upBtn.className = 'btn bar-up';
+                upBtn.textContent = '↑';
+                upBtn.onclick = function() {
+                    const prev = row.previousElementSibling;
+                    if (prev) barInputs.insertBefore(row, prev);
+                };
+                const downBtn = document.createElement('button');
+                downBtn.type = 'button';
+                downBtn.className = 'btn bar-down';
+                downBtn.textContent = '↓';
+                downBtn.onclick = function() {
+                    const next = row.nextElementSibling;
+                    if (next) barInputs.insertBefore(next, row);
+                };
+                row.append(labelInput, valueInput, colorInput, removeBtn, upBtn, downBtn);
+                barInputs.appendChild(row);
+                if (barInputs.children.length === 1) {
+                    barInputs.children[0].querySelector('.bar-remove').style.display = 'none';
+                } else {
+                    Array.from(barInputs.children).forEach(child => {
+                        child.querySelector('.bar-remove').style.display = '';
+                    });
+                }
+            }
+
+            // 更新比例输入框的占位文本
+            function updateValuePlaceholders() {
+                const placeholder = unitTypeSelect.value === 'percent' ? '比例（百分比）' : '比例（任意正数）';
+                document.querySelectorAll('.bar-value').forEach(input => {
+                    input.placeholder = placeholder;
+                });
+            }
+
+            unitTypeSelect.addEventListener('change', updateValuePlaceholders);
+            barAddBtn.onclick = function() {
+                addBarRow('', '', '', true);
+            };
+
+            // 初始添加一行
+            addBarRow('', '', '', true);
+
+            barGenBtn.onclick = function() {
+                errorMsg.textContent = '';
+                const labels = Array.from(document.querySelectorAll('.bar-label')).map(e => e.value.trim());
+                const values = Array.from(document.querySelectorAll('.bar-value')).map(e => parseFloat(e.value));
+                const colors = Array.from(document.querySelectorAll('.bar-color')).map(e => e.value);
+                const chartTitle = chartTitleInput.value.trim();
+                const chartWidth = parseInt(chartWidthInput.value) || 600;
+                const chartHeight = parseInt(chartHeightInput.value) || 400;
+                const unitType = unitTypeSelect.value;
+
+                // 验证输入
+                const validData = [];
+                for (let i = 0; i < labels.length; i++) {
+                    if (labels[i] && !isNaN(values[i]) && values[i] > 0) {
+                        validData.push({ label: labels[i], value: values[i], color: colors[i] });
+                    }
+                }
+
+                if (validData.length === 0) {
+                    errorMsg.textContent = '请填写至少一个有效的类别和比例（比例需大于0）。';
+                    barSaveBtn.style.display = 'none';
+                    barPreview.innerHTML = '';
+                    return;
+                }
+
+                const total = validData.reduce((a, b) => a + b.value, 0);
+                if (total <= 0) {
+                    errorMsg.textContent = '比例总和必须大于0。';
+                    barSaveBtn.style.display = 'none';
+                    barPreview.innerHTML = '';
+                    return;
+                }
+
+                // 验证百分比模式
+                if (unitType === 'percent' && Math.abs(total - 100) > 0.01) {
+                    errorMsg.textContent = `百分比模式下，所有比例之和必须为100%。当前总和：${total.toFixed(1)}%`;
+                    barSaveBtn.style.display = 'none';
+                    barPreview.innerHTML = '';
+                    return;
+                }
+
+                // 计算显示值（百分比模式直接使用输入值，任意正数模式归一化为百分比）
+                const displayValues = unitType === 'percent' ? validData.map(d => d.value) : validData.map(d => (d.value / total) * 100);
+
+                // 生成柱状图
+                const padding = 40;
+                const titleHeight = chartTitle ? 40 : 0;
+                const canvas = document.createElement('canvas');
+                canvas.width = chartWidth;
+                canvas.height = chartHeight + titleHeight + padding;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // 绘制标题
+                if (chartTitle) {
+                    ctx.font = 'bold 20px Poppins';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = '#1f2937';
+                    ctx.fillText(chartTitle, canvas.width / 2, 20);
+                }
+
+                // 计算柱状图参数
+                const barWidth = (canvas.width - padding * 3) / validData.length / 2;
+                const maxValue = Math.max(...displayValues);
+                const scale = (chartHeight - padding * 2) / maxValue;
+
+                // 绘制坐标轴
+                ctx.beginPath();
+                ctx.moveTo(padding, titleHeight + padding);
+                ctx.lineTo(padding, titleHeight + chartHeight - padding);
+                ctx.lineTo(canvas.width - padding, titleHeight + chartHeight - padding);
+                ctx.strokeStyle = '#4b5563';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // 绘制柱状图
+                validData.forEach((data, i) => {
+                    const barHeight = displayValues[i] * scale;
+                    const x = padding * 2 + i * (barWidth * 2);
+                    const y = titleHeight + chartHeight - padding - barHeight;
+                    ctx.fillStyle = data.color;
+                    ctx.fillRect(x, y, barWidth, barHeight);
+
+                    // 绘制标签
+                    ctx.font = '14px Poppins';
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = '#1f2937';
+                    ctx.fillText(data.label, x + barWidth / 2, titleHeight + chartHeight - padding + 20);
+                    ctx.fillText(`${displayValues[i].toFixed(1)}%`, x + barWidth / 2, y - 10);
+                });
+
+                barPreview.innerHTML = '';
+                barPreview.appendChild(canvas);
+                barSaveBtn.style.display = '';
+                barSaveBtn.onclick = function() {
+                    const link = document.createElement('a');
+                    link.href = canvas.toDataURL('image/png');
+                    link.download = chartTitle ? `${chartTitle}.png` : 'barchart.png';
+                    link.click();
+                };
+            };
+        })();
+    </script>
+</body>
+</html>
