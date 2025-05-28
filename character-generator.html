@@ -3,198 +3,348 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>字符生成器</title>
+    <title>字符生成器 - AKI Tools</title>
     <link rel="icon" type="image/png" href="http://momo-1-img.ao1160301aila.workers.dev/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', Arial, sans-serif;
             line-height: 1.6;
-            margin: 20px;
-            background-color: #f4f7fb;
-            color: #333;
+            background-color: #f5f6fa;
+            color: #2d3748;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
+
+        /* Header */
+        .page-header {
+            background: linear-gradient(90deg, #1e40af, #3b82f6);
+            color: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .header-nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header-nav a:hover {
+            color: #dbeafe;
+        }
+
+        /* Container */
         .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            margin: 2rem auto;
+            flex-grow: 1;
+            padding: 0 1rem;
         }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
         h1 {
             text-align: center;
-            color: #0056b3;
-            margin-bottom: 20px;
+            color: #1e40af;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
         }
+
         h2 {
-            color: #007bff;
-            margin-top: 25px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
+            color: #1e40af;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0.5rem;
         }
+
+        /* Section */
         .section {
-            margin-bottom: 25px;
-            padding: 20px;
-            background-color: #f9f9ff;
-            border: 1px solid #e3e3e3;
-            border-radius: 6px;
+            margin-bottom: 1.5rem;
         }
+
+        .section p, .section ol {
+            color: #4b5563;
+            font-size: 1rem;
+        }
+
+        .section ol {
+            padding-left: 1.5rem;
+        }
+
+        /* Form */
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
         label {
-            margin-right: 15px;
-            display: inline-block;
-            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #4b5563;
         }
-        input[type="text"], input[type="number"] {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-right: 5px;
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
         }
+
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
         button {
-            padding: 8px 18px;
-            background-color: #007bff;
-            color: white;
+            padding: 0.5rem 1.5rem;
+            background-color: #3b82f6;
+            color: #fff;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
+
         button:hover {
-            background-color: #0056b3;
+            background-color: #1e40af;
+            transform: translateY(-2px);
         }
+
         .reset-btn {
-            background-color: #6c757d;
-            margin-left: 10px;
+            background-color: #6b7280;
         }
+
         .reset-btn:hover {
-            background-color: #5a6268;
+            background-color: #4b5563;
         }
+
+        /* Result */
         .result {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e9ecef;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            word-break: break-all;
-            white-space: pre-wrap;
-            max-height: 300px;
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 1rem;
+            max-height: 400px;
             overflow-y: auto;
         }
+
         .result-item {
             display: flex;
             align-items: center;
-            margin-bottom: 8px;
-            padding-bottom: 5px;
-            border-bottom: 1px dashed #ccc;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e5e7eb;
         }
-         .result-item:last-child {
+
+        .result-item:last-child {
             border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
         }
+
         .result-text {
             flex-grow: 1;
-            margin-right: 10px;
+            font-size: 0.9rem;
+            color: #1f2937;
         }
-         .copy-btn {
-            padding: 4px 10px;
-            font-size: 0.9em;
+
+        .copy-btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+
+        /* Footer */
+        footer {
+            background: #1e40af;
+            color: #fff;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .footer-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-icon img {
+            width: 24px;
+            height: 24px;
+            filter: invert(1);
+            transition: transform 0.3s ease;
+        }
+
+        .footer-icon:hover img {
+            transform: scale(1.2);
+        }
+
+        .footer-team,
+        .footer-copy {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .header-nav {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .container {
+                margin: 1rem;
+            }
+
+            .form-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
 <body>
-  <header class="page-header">
-    <a class="back-home" href="index.html">返回主页</a>
-    <span class="header-title">工具页眉</span>
-  </header>
-  <style>
-    .page-header {
-      display: flex;
-      align-items: center;
-      background: #1976d2;
-      color: #fff;
-      padding: 12px 20px;
-      font-size: 1.2em;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-    .back-home {
-      color: #fff;
-      background: #1565c0;
-      border-radius: 4px;
-      padding: 5px 12px;
-      text-decoration: none;
-      margin-right: 18px;
-      font-weight: bold;
-      transition: background 0.2s;
-    }
-    .back-home:hover {
-      background: #0d47a1;
-    }
-    .header-title {
-      font-weight: bold;
-      font-size: 1.1em;
-      letter-spacing: 1px;
-    }
-  </style>
+    <header class="page-header">
+        <a href="index.html" class="header-logo">AKI Tools</a>
+        <nav class="header-nav">
+            <a href="/index.html">主页</a>
+            <a href="#generator">字符生成器</a>
+            <a href="#about">关于我们</a>
+            <a href="#contact">联系</a>
+        </nav>
+    </header>
+
     <div class="container">
-        <h1>字符生成器</h1>
+        <div class="card">
+            <h1>字符生成器</h1>
+            <div class="section">
+                <h2>使用说明</h2>
+                <p>本工具可生成指定长度和数量的随机字符串，支持自定义字符类型、前缀和后缀。</p>
+                <ol>
+                    <li>设置字符串的最小和最大长度。</li>
+                    <li>设置生成字符串的组数。</li>
+                    <li>（可选）输入前缀和后缀。</li>
+                    <li>选择包含的字符类型（数字、大写字母、小写字母、符号）。</li>
+                    <li>勾选“自定义”并输入自定义字符（可选）。</li>
+                    <li>点击“生成”按钮查看结果。</li>
+                    <li>每行结果可点击“复制”按钮复制到剪贴板。</li>
+                    <li>点击“重置”按钮恢复默认设置。</li>
+                </ol>
+            </div>
 
-        <div class="section">
-            <h2>使用说明</h2>
-            <p>
-                本工具可以生成指定长度和数量的随机字符串。您可以自定义包含的字符类型，并设置生成字符串的前缀和后缀。
-            </p>
-            <ol>
-                <li>设置字符串的最小和最大长度。</li>
-                <li>设置要生成的字符串组数。</li>
-                <li>（可选）输入前缀和后缀。</li>
-                <li>选择要包含的字符类型（数字、大写字母、小写字母、符号）。</li>
-                <li>如果勾选“自定义”，请在旁边的输入框中输入自定义字符。</li>
-                <li>点击“生成”按钮。</li>
-                <li>生成结果将显示在下方，每行带有复制按钮。</li>
-                <li>点击“重置”按钮可以恢复默认设置并清空结果。</li>
-            </ol>
-        </div>
+            <div class="section">
+                <h2>生成设置</h2>
+                <form id="genForm" onsubmit="return false;">
+                    <div class="form-group">
+                        <label>长度:</label>
+                        <input type="number" id="genMinLength" value="8" min="1" style="width: 80px;" aria-label="最小长度">
+                        <span>~</span>
+                        <input type="number" id="genMaxLength" value="16" min="1" style="width: 80px;" aria-label="最大长度">
+                        <span>位</span>
+                        <label>数量:</label>
+                        <input type="number" id="genCount" value="15" min="1" style="width: 80px;" aria-label="生成数量">
+                        <button id="generateBtn">生成</button>
+                        <button type="button" class="reset-btn" id="genResetBtn">重置</button>
+                    </div>
+                    <div class="form-group">
+                        <label>前缀: <input type="text" id="genPrefix" placeholder="可选" aria-label="前缀"></label>
+                        <label>后缀: <input type="text" id="genSuffix" placeholder="可选" aria-label="后缀"></label>
+                    </div>
+                    <div class="form-group">
+                        <label>选择字符类型:</label>
+                        <label><input type="checkbox" name="charset" value="num" checked> 数字 0-9</label>
+                        <label><input type="checkbox" name="charset" value="AZ" checked> 大写字母 A-Z</label>
+                        <label><input type="checkbox" name="charset" value="az" checked> 小写字母 a-z</label>
+                        <label><input type="checkbox" name="charset" value="symbol"> 符号</label>
+                        <label><input type="checkbox" name="charset" value="custom"> 自定义</label>
+                        <input type="text" id="customChars" placeholder="输入自定义字符" aria-label="自定义字符">
+                    </div>
+                </form>
+            </div>
 
-        <div class="section">
-            <h2>生成设置</h2>
-            <form id="genForm" onsubmit="return false;">
-                <div style="margin-bottom: 15px;">
-                    长度:
-                    <input type="number" id="genMinLength" value="8" min="1" style="width: 60px;"> ~
-                    <input type="number" id="genMaxLength" value="16" min="1" style="width: 60px;"> 位
-                    数量:
-                    <input type="number" id="genCount" value="15" min="1" style="width: 60px;"> 组
-                    <button id="generateBtn" style="margin-left: 15px;">生成</button>
-                    <button type="button" class="reset-btn" id="genResetBtn">重置</button>
+            <div class="section">
+                <h2>生成结果</h2>
+                <div id="result" class="result" aria-live="polite">
+                    <!-- 生成结果将显示在这里 -->
                 </div>
-                <div style="margin-bottom: 15px;">
-                    <label>前缀: <input type="text" id="genPrefix" style="width: 100px;" placeholder="可选"></label>
-                    <label>后缀: <input type="text" id="genSuffix" style="width: 100px;" placeholder="可选"></label>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    选择包含的字符：
-                    <label><input type="checkbox" name="charset" value="num" checked>数字 0-9</label>
-                    <label><input type="checkbox" name="charset" value="AZ" checked>大写字母A-Z</label>
-                    <label><input type="checkbox" name="charset" value="az" checked>小写字母a-z</label>
-                    <label><input type="checkbox" name="charset" value="symbol">符号</label>
-                    <label><input type="checkbox" name="charset" value="custom">自定义</label>
-                    <input type="text" id="customChars" style="width: 150px;" placeholder="输入自定义字符">
-                </div>
-            </form>
-        </div>
-
-        <div class="section">
-            <h2>生成结果</h2>
-            <div id="result" class="result">
-                <!-- 生成结果将显示在这里 -->
             </div>
         </div>
     </div>
 
+    <footer id="footer">
+        <div class="footer-icons">
+            <a href="https://youtube.com" target="_blank" title="YouTube" class="footer-icon">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg" alt="YouTube">
+            </a>
+            <a href="https://x.com" target="_blank" title="X" class="footer-icon">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X">
+            </a>
+            <a href="https://discord.com" target="_blank" title="Discord" class="footer-icon">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/discord.svg" alt="Discord">
+            </a>
+            <a href="https://instagram.com" target="_blank" title="Instagram" class="footer-icon">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram">
+            </a>
+            <a href="https://github.com/akxxxxxxxxx9" target="_blank" title="GitHub" class="footer-icon">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="GitHub">
+            </a>
+            <a href="https://t.me" target="_blank" title="Telegram" class="footer-icon">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="Telegram">
+            </a>
+        </div>
+        <div class="footer-team">团队成员：SUOU AKI</div>
+        <div class="footer-copy">© 2025 AKI | Powered by Cloudflare Workers</div>
+    </footer>
+
     <script>
-        document.getElementById('generateBtn').onclick = async function() {
+        document.getElementById('generateBtn').onclick = async function () {
             const charsets = Array.from(document.querySelectorAll('input[name="charset"]:checked')).map(el => el.value);
             let custom = '';
             if (charsets.includes('custom')) {
@@ -215,7 +365,7 @@
             if (charsets.includes('custom') && custom) charsPool.push(...custom);
 
             if (charsPool.length === 0) {
-                resultDiv.innerHTML = '<span style="color:red;">请至少选择一种字符集或输入自定义字符。</span>';
+                resultDiv.innerHTML = '<span style="color:#dc2626;">请至少选择一种字符集或输入自定义字符。</span>';
                 return;
             }
 
@@ -223,7 +373,7 @@
             const suffix = document.getElementById('genSuffix').value || '';
 
             for (let i = 0; i < count; i++) {
-                const len = minLen === maxLen ? minLen : (Math.floor(Math.random() * (maxLen - minLen + 1)) + minLen);
+                const len = minLen === maxLen ? minLen : Math.floor(Math.random() * (maxLen - minLen + 1)) + minLen;
                 let str = '';
                 for (let j = 0; j < len; j++) {
                     str += charsPool[Math.floor(Math.random() * charsPool.length)];
@@ -238,17 +388,20 @@
                 span.textContent = finalString;
 
                 const btn = document.createElement('button');
-                btn.className = 'btn copy-btn';
+                btn.className = 'copy-btn';
                 btn.textContent = '复制';
+                btn.setAttribute('aria-label', `复制 ${finalString}`);
                 btn.onclick = () => {
                     navigator.clipboard.writeText(finalString).then(() => {
-                        // Optional: Provide feedback to the user (e.g., change button text temporarily)
-                        const originalText = btn.textContent;
                         btn.textContent = '已复制!';
-                        setTimeout(() => { btn.textContent = originalText; }, 1500);
+                        btn.disabled = true;
+                        setTimeout(() => {
+                            btn.textContent = '复制';
+                            btn.disabled = false;
+                        }, 1500);
                     }).catch(err => {
-                         console.error('Failed to copy: ', err);
-                         alert('复制失败');
+                        console.error('Failed to copy: ', err);
+                        alert('复制失败');
                     });
                 };
 
@@ -258,7 +411,7 @@
             }
         };
 
-        document.getElementById('genResetBtn').onclick = function() {
+        document.getElementById('genResetBtn').onclick = function () {
             document.getElementById('genMinLength').value = 8;
             document.getElementById('genMaxLength').value = 16;
             document.getElementById('genCount').value = 15;
@@ -269,32 +422,5 @@
             document.getElementById('result').innerHTML = '';
         };
     </script>
-     <footer id="footer">
-        <div class="footer-icons">
-          <a href="https://youtube.com/你的频道" target="_blank" title="YouTube" class="footer-icon">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg" alt="YouTube">
-          </a>
-          <a href="https://x.com/你的账号" target="_blank" title="X" class="footer-icon">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X">
-          </a>
-          <a href="https://discord.com/你的账号" target="_blank" title="discord" class="footer-icon">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/discord.svg" alt="discord">
-          </a>
-          <a href="https://instagram.com/你的账号" target="_blank" title="Instagram" class="footer-icon">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram">
-          </a>
-          <a href="https://github.com/akxxxxxxxxx9" target="_blank" title="GitHub" class="footer-icon">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="GitHub">
-          </a>
-          <a href="https://web.telegram.org/你的账号" target="_blank" title="telegram" class="footer-icon">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="telegram">
-          </a>
-        </div>
-        <div class="footer-team">
-          团队成员：SUOU AKI
-        </div>
-        <div class="footer-copy">
-          &copy; 2025 AKI | Powered by Cloudflare Workers
-        </div>
 </body>
 </html>
