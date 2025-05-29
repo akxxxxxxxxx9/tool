@@ -3,248 +3,717 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>媒体播放器 - 在线视频与音乐</title>
+    <title>StreamFlow - 专业在线媒体播放器</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --bg-color: #0f1419;
+            --surface-color: #1a202c;
+            --card-color: #2d3748;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+            --text-muted: #718096;
+            --border-color: #4a5568;
+            --success-color: #48bb78;
+            --error-color: #f56565;
+            --warning-color: #ed8936;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #f4f7fa;
-            color: #333;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--bg-color) 0%, #1e2a3a 100%);
+            color: var(--text-primary);
             line-height: 1.6;
+            min-height: 100vh;
         }
+
+        /* 导航栏 */
         .navbar {
-            background-color: #2c3e50;
-            padding: 15px 20px;
-            color: white;
-            text-align: center;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
         }
-        .navbar h1 {
-            font-size: 24px;
-        }
-        .container {
-            max-width: 900px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .input-section {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        input[type="text"] {
-            flex: 1;
-            padding: 12px;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            min-width: 200px;
-        }
-        button {
-            padding: 12px 20px;
-            font-size: 16px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
-        .media-player {
-            margin: 20px 0;
-            text-align: center;
-        }
-        #videoPlayer, #audioPlayer {
-            width: 100%;
-            max-width: 800px;
-            border-radius: 5px;
-            display: none;
-        }
-        .media-info {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #555;
-        }
-        .controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .progress-container {
-            flex: 1;
-            height: 5px;
-            background-color: #ddd;
-            border-radius: 5px;
-            position: relative;
-            cursor: pointer;
-        }
-        .progress-bar {
-            width: 0;
-            height: 100%;
-            background-color: #3498db;
-            border-radius: 5px;
-        }
-        .volume-container {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        #volumeSlider {
-            width: 100px;
-        }
-        .playlist {
-            margin: 20px 0;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border-radius: 5px;
-        }
-        .playlist h3 {
-            margin-bottom: 10px;
-        }
-        .playlist-item {
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
-            margin: 5px 0;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            cursor: move;
         }
-        .playlist-item:hover {
-            background-color: #e8f4f8;
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
         }
-        .playlist-item button {
-            background-color: #e74c3c;
-            padding: 5px 10px;
-            font-size: 14px;
+
+        .logo i {
+            font-size: 2rem;
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .playlist-item button:hover {
-            background-color: #c0392b;
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
         }
-        .playlist-item.dragging {
-            opacity: 0.5;
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
         }
-        #error {
-            color: #e74c3c;
-            margin-top: 10px;
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* 主容器 */
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+
+        /* 媒体播放区域 */
+        .media-section {
+            background: var(--surface-color);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header i {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 输入区域 */
+        .input-section {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .url-input-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .url-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            font-size: 1rem;
+            background: var(--card-color);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .url-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .url-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .add-btn {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 媒体播放器 */
+        .media-player {
             text-align: center;
+            margin: 2rem 0;
+        }
+
+        #videoPlayer, #audioPlayer {
+            width: 100%;
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
             display: none;
         }
-        .instructions {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #e8f4f8;
-            border-left: 5px solid #3498db;
-            border-radius: 5px;
+
+        .media-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--card-color);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
         }
-        .instructions h2 {
-            font-size: 20px;
-            margin-bottom: 10px;
+
+        /* 控制器 */
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--card-color);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
         }
-        .instructions ul {
-            list-style-type: disc;
-            padding-left: 20px;
-        }
-        footer {
-            text-align: center;
-            padding: 20px;
-            background-color: #2c3e50;
-            color: white;
+
+        .progress-container {
+            flex: 1;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
             position: relative;
-            bottom: 0;
-            width: 100%;
-            margin-top: 20px;
+            cursor: pointer;
+            overflow: hidden;
         }
-        @media (max-width: 600px) {
-            .input-section, .controls {
+
+        .progress-bar {
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 3px;
+            transition: width 0.1s ease;
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .volume-container i {
+            color: var(--text-secondary);
+        }
+
+        #volumeSlider {
+            width: 80px;
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        #volumeSlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .control-btn {
+            padding: 0.5rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .control-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* 播放列表 */
+        .playlist-section {
+            background: var(--surface-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        .playlist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .playlist-count {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .playlist-items {
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--card-color);
+        }
+
+        .playlist-items::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .playlist-items::-webkit-scrollbar-track {
+            background: var(--card-color);
+            border-radius: 3px;
+        }
+
+        .playlist-items::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: var(--card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .playlist-item:hover {
+            background: var(--primary-color);
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .playlist-item.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-color: var(--accent-color);
+        }
+
+        .playlist-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .playlist-item-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .playlist-item-url {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .playlist-item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .playlist-btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            background: rgba(245, 101, 101, 0.2);
+            color: var(--error-color);
+            border: 1px solid rgba(245, 101, 101, 0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .playlist-btn:hover {
+            background: var(--error-color);
+            color: white;
+        }
+
+        /* 使用说明 */
+        .instructions-section {
+            background: var(--surface-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        .instructions-content {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .instructions-content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .instructions-content li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .instructions-content li::before {
+            content: "▶";
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+        }
+
+        .example-links {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--card-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .example-link {
+            display: block;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.8rem;
+            margin: 0.25rem 0;
+            word-break: break-all;
+        }
+
+        .example-link:hover {
+            color: var(--accent-color);
+        }
+
+        /* 错误信息 */
+        #error {
+            background: rgba(245, 101, 101, 0.1);
+            color: var(--error-color);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            text-align: center;
+            display: none;
+            border: 1px solid rgba(245, 101, 101, 0.3);
+        }
+
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            padding: 3rem 2rem 2rem;
+            background: var(--surface-color);
+            margin-top: 4rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--accent-color);
+        }
+
+        .copyright {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                padding: 0 1rem;
+            }
+
+            .nav-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .input-section {
                 flex-direction: column;
             }
-            button, #volumeSlider {
-                width: 100%;
+
+            .controls {
+                flex-wrap: wrap;
+                gap: 0.5rem;
             }
+
+            .volume-container {
+                order: -1;
+                width: 100%;
+                justify-content: center;
+            }
+
+            #volumeSlider {
+                width: 150px;
+            }
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 拖拽效果 */
+        .playlist-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--text-muted);
         }
     </style>
 </head>
 <body>
     <header class="navbar">
-        <h1>媒体播放器</h1>
+        <div class="nav-content">
+            <div class="logo">
+                <i class="fas fa-play-circle"></i>
+                <span>StreamFlow</span>
+            </div>
+            <nav class="nav-links">
+                <a href="#" class="nav-link"><i class="fas fa-home"></i> 首页</a>
+                <a href="#" class="nav-link"><i class="fas fa-music"></i> 音乐</a>
+                <a href="#" class="nav-link"><i class="fas fa-video"></i> 视频</a>
+                <a href="#" class="nav-link"><i class="fas fa-cog"></i> 设置</a>
+            </nav>
+        </div>
     </header>
 
-    <div class="container">
-        <div class="instructions">
-            <h2>使用说明</h2>
-            <p>欢迎使用在线媒体播放器！请按照以下步骤操作：</p>
-            <ul>
-                <li>在输入框中粘贴视频（如MP4、WebM、Ogg）或音乐（如MP3、WAV、Ogg）的直链地址。</li>
-                <li>点击“添加到播放列表”按钮，链接加入播放列表，列表会自动保存。</li>
-                <li>点击播放列表中的链接开始播放，或点击“删除”移除链接，拖拽调整播放顺序。</li>
-                <li>当前媒体播放结束后，会自动播放列表中的下一个媒体。</li>
-                <li>使用音量滑块调整音量，拖动进度条跳转播放位置，视频支持全屏播放。</li>
-                <li>媒体信息（如标题、时长）会显示在播放器下方（依赖链接支持）。</li>
-                <li>确保链接支持跨域访问（CORS），否则可能无法播放。</li>
-                <li>示例链接：
-                    <ul>
-                        <li>视频：https://www.w3schools.com/html/mov_bbb.mp4</li>
-                        <li>音乐：https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3</li>
-                    </ul>
-                </li>
-                <li>如遇到错误，请检查链接是否有效或格式是否支持。</li>
-            </ul>
-        </div>
-
-        <div class="input-section">
-            <input type="text" id="mediaUrl" placeholder="请输入视频或音乐链接">
-            <button onclick="addToPlaylist()">添加到播放列表</button>
-        </div>
-
-        <div class="playlist">
-            <h3>播放列表</h3>
-            <div id="playlistItems"></div>
-        </div>
-
-        <div class="media-player">
-            <video id="videoPlayer" controls>
-                <source id="videoSource" src="">
-                你的浏览器不支持视频播放。
-            </video>
-            <audio id="audioPlayer" controls>
-                <source id="audioSource" src="">
-                你的浏览器不支持音频播放。
-            </audio>
-            <div class="media-info" id="mediaInfo"></div>
-            <div class="controls">
-                <div class="progress-container" id="progressContainer">
-                    <div class="progress-bar" id="progressBar"></div>
-                </div>
-                <div class="volume-container">
-                    <label for="volumeSlider">音量:</label>
-                    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
-                </div>
-                <button id="fullscreenBtn" onclick="toggleFullScreen()" style="display: none;">全屏</button>
+    <div class="main-container">
+        <main class="media-section">
+            <div class="section-header">
+                <i class="fas fa-play"></i>
+                <h2>媒体播放器</h2>
             </div>
-        </div>
-        <p id="error"></p>
+
+            <div class="input-section">
+                <div class="url-input-container">
+                    <i class="fas fa-link input-icon"></i>
+                    <input type="text" id="mediaUrl" class="url-input" placeholder="输入视频或音乐链接 (支持 MP4, MP3, WebM, Ogg 等格式)">
+                </div>
+                <button class="add-btn" onclick="addToPlaylist()">
+                    <i class="fas fa-plus"></i>
+                    添加到播放列表
+                </button>
+            </div>
+
+            <div class="media-player">
+                <video id="videoPlayer" controls>
+                    <source id="videoSource" src="">
+                    你的浏览器不支持视频播放。
+                </video>
+                <audio id="audioPlayer" controls>
+                    <source id="audioSource" src="">
+                    你的浏览器不支持音频播放。
+                </audio>
+                <div class="media-info" id="mediaInfo" style="display: none;"></div>
+                <div class="controls">
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <div class="volume-container">
+                        <i class="fas fa-volume-up"></i>
+                        <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+                    </div>
+                    <button id="fullscreenBtn" class="control-btn" onclick="toggleFullScreen()" style="display: none;">
+                        <i class="fas fa-expand"></i>
+                        全屏
+                    </button>
+                </div>
+            </div>
+
+            <div id="error"></div>
+        </main>
+
+        <aside class="sidebar">
+            <section class="playlist-section">
+                <div class="playlist-header">
+                    <div class="section-header">
+                        <i class="fas fa-list"></i>
+                        <h3>播放列表</h3>
+                    </div>
+                    <span class="playlist-count" id="playlistCount">0 首</span>
+                </div>
+                <div class="playlist-items" id="playlistItems">
+                    <div class="empty-state">
+                        <i class="fas fa-music"></i>
+                        <p>播放列表为空</p>
+                        <p>添加一些媒体文件开始播放吧！</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="instructions-section">
+                <div class="section-header">
+                    <i class="fas fa-info-circle"></i>
+                    <h3>使用说明</h3>
+                </div>
+                <div class="instructions-content">
+                    <ul>
+                        <li>粘贴媒体文件的直链地址到输入框中</li>
+                        <li>点击"添加到播放列表"按钮</li>
+                        <li>点击播放列表中的项目开始播放</li>
+                        <li>支持拖拽调整播放顺序</li>
+                        <li>播放结束后自动播放下一首</li>
+                        <li>支持音量调节和进度控制</li>
+                    </ul>
+                    
+                    <div class="example-links">
+                        <strong>示例链接：</strong><br>
+                        <a href="#" class="example-link" onclick="document.getElementById('mediaUrl').value='https://www.w3schools.com/html/mov_bbb.mp4'; return false;">
+                            示例视频 - Big Buck Bunny
+                        </a>
+                        <a href="#" class="example-link" onclick="document.getElementById('mediaUrl').value='https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; return false;">
+                            示例音频 - SoundHelix Song
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </aside>
     </div>
 
-    <footer>
-        <p>© 2025 媒体播放器 | 由Grok提供技术支持</p>
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#" class="footer-link">关于我们</a>
+                <a href="#" class="footer-link">隐私政策</a>
+                <a href="#" class="footer-link">使用条款</a>
+                <a href="#" class="footer-link">联系我们</a>
+            </div>
+            <div class="copyright">
+                <p>© 2025 StreamFlow Media Player | 专业在线媒体播放解决方案</p>
+            </div>
+        </div>
     </footer>
 
     <script>
-        let playlist = JSON.parse(localStorage.getItem('playlist')) || [];
+        let playlist = [];
         let currentMedia = null;
 
         const videoPlayer = document.getElementById('videoPlayer');
@@ -253,6 +722,7 @@
         const audioSource = document.getElementById('audioSource');
         const errorMsg = document.getElementById('error');
         const playlistItems = document.getElementById('playlistItems');
+        const playlistCount = document.getElementById('playlistCount');
         const progressContainer = document.getElementById('progressContainer');
         const progressBar = document.getElementById('progressBar');
         const volumeSlider = document.getElementById('volumeSlider');
@@ -263,12 +733,11 @@
         updatePlaylist();
 
         function addToPlaylist() {
-            const urlInput = document.getElementById('mediaUrl').value;
+            const urlInput = document.getElementById('mediaUrl').value.trim();
             errorMsg.style.display = 'none';
 
             if (!urlInput) {
-                errorMsg.textContent = '请输入有效的视频或音乐链接！';
-                errorMsg.style.display = 'block';
+                showError('请输入有效的媒体链接！');
                 return;
             }
 
@@ -276,27 +745,62 @@
             try {
                 url = new URL(urlInput);
             } catch {
-                errorMsg.textContent = '请输入正确的URL格式！';
-                errorMsg.style.display = 'block';
+                showError('请输入正确的URL格式！');
+                return;
+            }
+
+            // 检查是否已存在
+            if (playlist.includes(urlInput)) {
+                showError('该链接已存在于播放列表中！');
                 return;
             }
 
             playlist.push(urlInput);
-            localStorage.setItem('playlist', JSON.stringify(playlist));
             document.getElementById('mediaUrl').value = '';
             updatePlaylist();
+            
+            // 如果是第一个添加的媒体，自动播放
+            if (playlist.length === 1) {
+                setTimeout(() => playMedia(0), 500);
+            }
         }
 
         function updatePlaylist() {
+            playlistCount.textContent = `${playlist.length} 首`;
+            
+            if (playlist.length === 0) {
+                playlistItems.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-music"></i>
+                        <p>播放列表为空</p>
+                        <p>添加一些媒体文件开始播放吧！</p>
+                    </div>
+                `;
+                return;
+            }
+
             playlistItems.innerHTML = '';
             playlist.forEach((url, index) => {
                 const item = document.createElement('div');
-                item.className = 'playlist-item';
+                item.className = `playlist-item ${currentMedia === index ? 'active' : ''}`;
                 item.draggable = true;
+                
+                const fileName = url.split('/').pop() || `媒体文件 ${index + 1}`;
+                const shortUrl = url.length > 40 ? url.substring(0, 40) + '...' : url;
+                
                 item.innerHTML = `
-                    <span onclick="playMedia(${index})">${url}</span>
-                    <button onclick="removeFromPlaylist(${index})">删除</button>
+                    <div class="playlist-item-info" onclick="playMedia(${index})">
+                        <div class="playlist-item-title">${fileName}</div>
+                        <div class="playlist-item-url">${shortUrl}</div>
+                    </div>
+                    <div class="playlist-item-actions">
+                        <button class="playlist-btn" onclick="removeFromPlaylist(${index})" title="删除">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 `;
+                
+                // 拖拽事件
                 item.addEventListener('dragstart', (e) => {
                     e.dataTransfer.setData('text/plain', index);
                     item.classList.add('dragging');
@@ -311,6 +815,7 @@
                     const toIndex = index;
                     reorderPlaylist(fromIndex, toIndex);
                 });
+                
                 playlistItems.appendChild(item);
             });
         }
@@ -318,19 +823,33 @@
         function reorderPlaylist(fromIndex, toIndex) {
             const [movedItem] = playlist.splice(fromIndex, 1);
             playlist.splice(toIndex, 0, movedItem);
-            localStorage.setItem('playlist', JSON.stringify(playlist));
+            
+            // 更新当前播放索引
+            if (currentMedia === fromIndex) {
+                currentMedia = toIndex;
+            } else if (currentMedia > fromIndex && currentMedia <= toIndex) {
+                currentMedia--;
+            } else if (currentMedia < fromIndex && currentMedia >= toIndex) {
+                currentMedia++;
+            }
+            
             updatePlaylist();
         }
 
         function removeFromPlaylist(index) {
             playlist.splice(index, 1);
-            localStorage.setItem('playlist', JSON.stringify(playlist));
-            updatePlaylist();
+            
             if (currentMedia === index) {
                 stopMedia();
+                if (playlist.length > 0) {
+                    const nextIndex = index < playlist.length ? index : 0;
+                    setTimeout(() => playMedia(nextIndex), 100);
+                }
             } else if (currentMedia > index) {
                 currentMedia--;
             }
+            
+            updatePlaylist();
         }
 
         function stopMedia() {
@@ -339,132 +858,42 @@
             videoPlayer.style.display = 'none';
             audioPlayer.style.display = 'none';
             fullscreenBtn.style.display = 'none';
-            mediaInfo.textContent = '';
+            mediaInfo.style.display = 'none';
+            progressBar.style.width = '0%';
             currentMedia = null;
         }
 
         async function fetchMediaInfo(url) {
             try {
                 const response = await fetch(url, { method: 'HEAD' });
-                const contentType = response.headers.get('content-type') || '未知';
-                let title = url.split('/').pop() || '未知标题';
-                let duration = '未知时长';
-
-                // 尝试加载媒体获取时长
-                const tempMedia = contentType.includes('video') ? document.createElement('video') : document.createElement('audio');
-                tempMedia.src = url;
-                await new Promise((resolve) => {
-                    tempMedia.onloadedmetadata = () => {
-                        duration = formatDuration(tempMedia.duration);
-                        resolve();
-                    };
-                    tempMedia.onerror = () => resolve();
-                });
-
-                return { title, duration, contentType };
+                const contentType = response.headers.get('content-type') || '未知格式';
+                const contentLength = response.headers.get('content-length');
+                
+                let title = url.split('/').pop().split('?')[0] || '未知标题';
+                let fileSize = contentLength ? formatFileSize(parseInt(contentLength)) : '未知大小';
+                
+                return { title, fileSize, contentType };
             } catch {
-                return { title: url.split('/').pop() || '未知标题', duration: '无法获取', contentType: '未知' };
+                return { 
+                    title: url.split('/').pop().split('?')[0] || '未知标题',
+                    fileSize: '无法获取',
+                    contentType: '未知格式'
+                };
             }
+        }
+
+        function formatFileSize(bytes) {
+            if (!bytes) return '未知大小';
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(1024));
+            return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
         }
 
         function formatDuration(seconds) {
             if (!seconds || isNaN(seconds)) return '未知时长';
-            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
             const secs = Math.floor(seconds % 60);
-            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
-        }
-
-        async function playMedia(index) {
-            const url = playlist[index];
-            currentMedia = index;
-            errorMsg.style.display = 'none';
-            videoPlayer.style.display = 'none';
-            audioPlayer.style.display = 'none';
-            fullscreenBtn.style.display = 'none';
-            mediaInfo.textContent = '正在加载媒体信息...';
-
-            const videoFormats = ['.mp4', '.webm', '.ogg'];
-            const audioFormats = ['.mp3', '.wav', '.ogg'];
-            const extension = new URL(url).pathname.toLowerCase().slice(-4);
-
-            // 获取媒体信息
-            const info = await fetchMediaInfo(url);
-            mediaInfo.textContent = `标题: ${info.title} | 时长: ${info.duration} | 类型: ${info.contentType}`;
-
-            if (videoFormats.includes(extension)) {
-                videoSource.src = url;
-                videoPlayer.load();
-                videoPlayer.oncanplay = () => {
-                    videoPlayer.style.display = 'block';
-                    fullscreenBtn.style.display = 'inline-block';
-                    videoPlayer.play();
-                };
-                videoPlayer.onerror = () => {
-                    errorMsg.textContent = '无法加载视频，请检查链接是否有效或支持的格式！';
-                    errorMsg.style.display = 'block';
-                    mediaInfo.textContent = '';
-                };
-                videoPlayer.ontimeupdate = updateProgress;
-                videoPlayer.onended = playNext;
-                audioPlayer.pause();
-            } else if (audioFormats.includes(extension)) {
-                audioSource.src = url;
-                audioPlayer.load();
-                audioPlayer.oncanplay = () => {
-                    audioPlayer.style.display = 'block';
-                    audioPlayer.play();
-                };
-                audioPlayer.onerror = () => {
-                    errorMsg.textContent = '无法加载音频，请检查链接是否有效或支持的格式！';
-                    errorMsg.style.display = 'block';
-                    mediaInfo.textContent = '';
-                };
-                audioPlayer.ontimeupdate = updateProgress;
-                audioPlayer.onended = playNext;
-                videoPlayer.pause();
-            } else {
-                errorMsg.textContent = '不支持的文件格式！请使用MP4、WebM、Ogg（视频）或MP3、WAV、Ogg（音频）。';
-                errorMsg.style.display = 'block';
-                mediaInfo.textContent = '';
-            }
-        }
-
-        function playNext() {
-            if (currentMedia !== null && currentMedia < playlist.length - 1) {
-                playMedia(currentMedia + 1);
-            } else {
-                stopMedia();
-            }
-        }
-
-        function updateProgress() {
-            const player = videoPlayer.style.display !== 'none' ? videoPlayer : audioPlayer;
-            const progress = (player.currentTime / player.duration) * 100;
-            progressBar.style.width = `${progress}%`;
-        }
-
-        progressContainer.addEventListener('click', (e) => {
-            const player = videoPlayer.style.display !== 'none' ? videoPlayer : audioPlayer;
-            const rect = progressContainer.getBoundingClientRect();
-            const pos = (e.clientX - rect.left) / rect.width;
-            player.currentTime = pos * player.duration;
-        });
-
-        volumeSlider.addEventListener('input', () => {
-            videoPlayer.volume = volumeSlider.value;
-            audioPlayer.volume = volumeSlider.value;
-        });
-
-        function toggleFullScreen() {
-            if (!document.fullscreenElement) {
-                videoPlayer.requestFullscreen().catch(err => {
-                    errorMsg.textContent = `全屏模式失败：${err.message}`;
-                    errorMsg.style.display = 'block';
-                });
-            } else {
-                document.exitFullscreen();
-            }
-        }
-    </script>
-</body>
-</html>
+            
+            if (hours > 0) {
+                return `${hours}:${minutes.toString().padStart(2, '0'
