@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>媒体播放器 - 在线视频与音乐</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f4f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .navbar {
+            background-color: #2c3e50;
+            padding: 15px 20px;
+            color: white;
+            text-align: center;
+        }
+        .navbar h1 {
+            font-size: 24px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .input-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-width: 200px;
+        }
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .media-player {
+            margin: 20px 0;
+            text-align: center;
+        }
+        #videoPlayer, #audioPlayer {
+            width: 100%;
+            max-width: 800px;
+            border-radius: 5px;
+            display: none;
+        }
+        .media-info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .progress-container {
+            flex: 1;
+            height: 5px;
+            background-color: #ddd;
+            border-radius: 5px;
+            position: relative;
+            cursor: pointer;
+        }
+        .progress-bar {
+            width: 0;
+            height: 100%;
+            background-color: #3498db;
+            border-radius: 5px;
+        }
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        #volumeSlider {
+            width: 100px;
+        }
+        .playlist {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .playlist h3 {
+            margin-bottom: 10px;
+        }
+        .playlist-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: move;
+        }
+        .playlist-item:hover {
+            background-color: #e8f4f8;
+        }
+        .playlist-item button {
+            background-color: #e74c3c;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        .playlist-item button:hover {
+            background-color: #c0392b;
+        }
+        .playlist-item.dragging {
+            opacity: 0.5;
+        }
+        #error {
+            color: #e74c3c;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+        .instructions {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e8f4f8;
+            border-left: 5px solid #3498db;
+            border-radius: 5px;
+        }
+        .instructions h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .instructions ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #2c3e50;
+            color: white;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            margin-top: 20px;
+        }
+        @media (max-width: 600px) {
+            .input-section, .controls {
+                flex-direction: column;
+            }
+            button, #volumeSlider {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <h1>媒体播放器</h1>
+    </header>
+
+    <div class="container">
+        <div class="instructions">
+            <h2>使用说明</h2>
+            <p>欢迎使用在线媒体播放器！请按照以下步骤操作：</p>
+            <ul>
+                <li>在输入框中粘贴视频（如MP4、WebM、Ogg）或音乐（如MP3、WAV、Ogg）的直链地址。</li>
+                <li>点击“添加到播放列表”按钮，链接加入播放列表，列表会自动保存。</li>
+                <li>点击播放列表中的链接开始播放，或点击“删除”移除链接，拖拽调整播放顺序。</li>
+                <li>当前媒体播放结束后，会自动播放列表中的下一个媒体。</li>
+                <li>使用音量滑块调整音量，拖动进度条跳转播放位置，视频支持全屏播放。</li>
+                <li>媒体信息（如标题、时长）会显示在播放器下方（依赖链接支持）。</li>
+                <li>确保链接支持跨域访问（CORS），否则可能无法播放。</li>
+                <li>示例链接：
+                    <ul>
+                        <li>视频：https://www.w3schools.com/html/mov_bbb.mp4</li>
+                        <li>音乐：https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3</li>
+                    </ul>
+                </li>
+                <li>如遇到错误，请检查链接是否有效或格式是否支持。</li>
+            </ul>
+        </div>
+
+        <div class="input-section">
+            <input type="text" id="mediaUrl" placeholder="请输入视频或音乐链接">
+            <button onclick="addToPlaylist()">添加到播放列表</button>
+        </div>
+
+        <div class="playlist">
+            <h3>播放列表</h3>
+            <div id="playlistItems"></div>
+        </div>
+
+        <div class="media-player">
+            <video id="videoPlayer" controls>
+                <source id="videoSource" src="">
+                你的浏览器不支持视频播放。
+            </video>
+            <audio id="audioPlayer" controls>
+                <source id="audioSource" src="">
+                你的浏览器不支持音频播放。
+            </audio>
+            <div class="media-info" id="mediaInfo"></div>
+            <div class="controls">
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="volume-container">
+                    <label for="volumeSlider">音量:</label>
+                    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+                </div>
+                <button id="fullscreenBtn" onclick="toggleFullScreen()" style="display: none;">全屏</button>
+            </div>
+        </div>
+        <p id="error"></p>
+    </div>
+
+    <footer>
+        <p>© 2025 媒体播放器 | 由Grok提供技术支持</p>
+    </footer>
+
+    <script>
+        let playlist = JSON.parse(localStorage.getItem('playlist')) || [];
+        let currentMedia = null;
+
+        const videoPlayer = document.getElementById('videoPlayer');
+        const videoSource = document.getElementById('videoSource');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const audioSource = document.getElementById('audioSource');
+        const errorMsg = document.getElementById('error');
+        const playlistItems = document.getElementById('playlistItems');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const mediaInfo = document.getElementById('mediaInfo');
+
+        // 初始化播放列表
+        updatePlaylist();
+
+        function addToPlaylist() {
+            const urlInput = document.getElementById('mediaUrl').value;
+            errorMsg.style.display = 'none';
+
+            if (!urlInput) {
+                errorMsg.textContent = '请输入有效的视频或音乐链接！';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            let url;
+            try {
+                url = new URL(urlInput);
+            } catch {
+                errorMsg.textContent = '请输入正确的URL格式！';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            playlist.push(urlInput);
+            localStorage.setItem('playlist', JSON.stringify(playlist));
+            document.getElementById('mediaUrl').value = '';
+            updatePlaylist();
+        }
+
+        function updatePlaylist() {
+            playlistItems.innerHTML = '';
+            playlist.forEach((url, index) => {
+                const item = document.createElement('div');
+                item.className = 'playlist-item';
+                item.draggable = true;
+                item.innerHTML = `
+                    <span onclick="playMedia(${index})">${url}</span>
+                    <button onclick="removeFromPlaylist(${index})">删除</button>
+                `;
+                item.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', index);
+                    item.classList.add('dragging');
+                });
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                });
+                item.addEventListener('dragover', (e) => e.preventDefault());
+                item.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                    const toIndex = index;
+                    reorderPlaylist(fromIndex, toIndex);
+                });
+                playlistItems.appendChild(item);
+            });
+        }
+
+        function reorderPlaylist(fromIndex, toIndex) {
+            const [movedItem] = playlist.splice(fromIndex, 1);
+            playlist.splice(toIndex, 0, movedItem);
+            localStorage.setItem('playlist', JSON.stringify(playlist));
+            updatePlaylist();
+        }
+
+        function removeFromPlaylist(index) {
+            playlist.splice(index, 1);
+            localStorage.setItem('playlist', JSON.stringify(playlist));
+            updatePlaylist();
+            if (currentMedia === index) {
+                stopMedia();
+            } else if (currentMedia > index) {
+                currentMedia--;
+            }
+        }
+
+        function stopMedia() {
+            videoPlayer.pause();
+            audioPlayer.pause();
+            videoPlayer.style.display = 'none';
+            audioPlayer.style.display = 'none';
+            fullscreenBtn.style.display = 'none';
+            mediaInfo.textContent = '';
+            currentMedia = null;
+        }
+
+        async function fetchMediaInfo(url) {
+            try {
+                const response = await fetch(url, { method: 'HEAD' });
+                const contentType = response.headers.get('content-type') || '未知';
+                let title = url.split('/').pop() || '未知标题';
+                let duration = '未知时长';
+
+                // 尝试加载媒体获取时长
+                const tempMedia = contentType.includes('video') ? document.createElement('video') : document.createElement('audio');
+                tempMedia.src = url;
+                await new Promise((resolve) => {
+                    tempMedia.onloadedmetadata = () => {
+                        duration = formatDuration(tempMedia.duration);
+                        resolve();
+                    };
+                    tempMedia.onerror = () => resolve();
+                });
+
+                return { title, duration, contentType };
+            } catch {
+                return { title: url.split('/').pop() || '未知标题', duration: '无法获取', contentType: '未知' };
+            }
+        }
+
+        function formatDuration(seconds) {
+            if (!seconds || isNaN(seconds)) return '未知时长';
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        async function playMedia(index) {
+            const url = playlist[index];
+            currentMedia = index;
+            errorMsg.style.display = 'none';
+            videoPlayer.style.display = 'none';
+            audioPlayer.style.display = 'none';
+            fullscreenBtn.style.display = 'none';
+            mediaInfo.textContent = '正在加载媒体信息...';
+
+            const videoFormats = ['.mp4', '.webm', '.ogg'];
+            const audioFormats = ['.mp3', '.wav', '.ogg'];
+            const extension = new URL(url).pathname.toLowerCase().slice(-4);
+
+            // 获取媒体信息
+            const info = await fetchMediaInfo(url);
+            mediaInfo.textContent = `标题: ${info.title} | 时长: ${info.duration} | 类型: ${info.contentType}`;
+
+            if (videoFormats.includes(extension)) {
+                videoSource.src = url;
+                videoPlayer.load();
+                videoPlayer.oncanplay = () => {
+                    videoPlayer.style.display = 'block';
+                    fullscreenBtn.style.display = 'inline-block';
+                    videoPlayer.play();
+                };
+                videoPlayer.onerror = () => {
+                    errorMsg.textContent = '无法加载视频，请检查链接是否有效或支持的格式！';
+                    errorMsg.style.display = 'block';
+                    mediaInfo.textContent = '';
+                };
+                videoPlayer.ontimeupdate = updateProgress;
+                videoPlayer.onended = playNext;
+                audioPlayer.pause();
+            } else if (audioFormats.includes(extension)) {
+                audioSource.src = url;
+                audioPlayer.load();
+                audioPlayer.oncanplay = () => {
+                    audioPlayer.style.display = 'block';
+                    audioPlayer.play();
+                };
+                audioPlayer.onerror = () => {
+                    errorMsg.textContent = '无法加载音频，请检查链接是否有效或支持的格式！';
+                    errorMsg.style.display = 'block';
+                    mediaInfo.textContent = '';
+                };
+                audioPlayer.ontimeupdate = updateProgress;
+                audioPlayer.onended = playNext;
+                videoPlayer.pause();
+            } else {
+                errorMsg.textContent = '不支持的文件格式！请使用MP4、WebM、Ogg（视频）或MP3、WAV、Ogg（音频）。';
+                errorMsg.style.display = 'block';
+                mediaInfo.textContent = '';
+            }
+        }
+
+        function playNext() {
+            if (currentMedia !== null && currentMedia < playlist.length - 1) {
+                playMedia(currentMedia + 1);
+            } else {
+                stopMedia();
+            }
+        }
+
+        function updateProgress() {
+            const player = videoPlayer.style.display !== 'none' ? videoPlayer : audioPlayer;
+            const progress = (player.currentTime / player.duration) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        progressContainer.addEventListener('click', (e) => {
+            const player = videoPlayer.style.display !== 'none' ? videoPlayer : audioPlayer;
+            const rect = progressContainer.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            player.currentTime = pos * player.duration;
+        });
+
+        volumeSlider.addEventListener('input', () => {
+            videoPlayer.volume = volumeSlider.value;
+            audioPlayer.volume = volumeSlider.value;
+        });
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                videoPlayer.requestFullscreen().catch(err => {
+                    errorMsg.textContent = `全屏模式失败：${err.message}`;
+                    errorMsg.style.display = 'block';
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+    </script>
+</body>
+</html>
