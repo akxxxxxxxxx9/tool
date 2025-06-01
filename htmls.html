@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML编辑器与预览</title>
+    <!-- 引入CodeMirror CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            height: 70vh;
+        }
+        .editor, .preview {
+            flex: 1;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .preview iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .controls {
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        .CodeMirror {
+            height: 100% !important;
+            font-size: 14px;
+        }
+        .guide {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .guide details {
+            margin-bottom: 10px;
+        }
+        .guide summary {
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .guide p, .guide pre {
+            margin: 10px 0;
+        }
+        .guide pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <button onclick="copyCode()">复制代码</button>
+        <button onclick="exportHTML()">导出HTML</button>
+    </div>
+    <div class="container">
+        <div class="editor">
+            <textarea id="codeEditor"><!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<header>
+  <h1>我的网站标题</h1>
+  <nav>
+    <a href="#home">首页</a>
+    <a href="#about">关于</a>
+    <a href="#contact">联系</a>
+  </nav>
+</header>
+<body>
+    <h1 style="color: #ff6600;">欢迎体验HTML编辑器</h1>
+    <p>
+  <span style="color: red;">在</span>
+  <span style="color: orange;">这</span>
+  <span style="color: yellow;">里</span>
+  <span style="color: green;">编</span>
+  <span style="color: blue;">写</span>
+  <span style="color: indigo;">H</span>
+  <span style="color: violet;">T</span>
+  <span style="color: teal;">M</span>
+  <span style="color: brown;">L</span>
+  <span>代码，实时预览效果！</span>
+</p>
+</body>
+</html></textarea>
+        </div>
+        <div class="preview">
+            <iframe id="previewFrame"></iframe>
+        </div>
+    </div>
+    <div class="guide">
+        <h2>HTML语法使用说明</h2>
+        <details>
+            <summary>1. HTML基础结构</summary>
+            <p>HTML文档的基本结构包括以下部分：</p>
+            <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="zh-CN"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;网页标题&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;!-- 内容写在这里 --&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            <p><strong>说明</strong>：&lt;!DOCTYPE html&gt;声明HTML5文档，&lt;html&gt;是根元素，&lt;head&gt;包含元数据，&lt;body&gt;包含网页可见内容。</p>
+        </details>
+        <details>
+            <summary>2. 常用HTML标签</summary>
+            <p>以下是常用的HTML标签及其用途：</p>
+            <pre><code>&lt;h1&gt;至&lt;h6&gt;：标题（从大到小）
+&lt;p&gt;：段落
+&lt;a href="URL"&gt;：超链接
+&lt;img src="图片路径" alt="描述"&gt;：图片
+&lt;imgs src="img src="图片路径" alt="描述" width="300" height="200""&gt;：图片2
+&lt;div&gt;：块级容器
+&lt;span&gt;：内联容器
+&lt;it&gt;:notes                
+&lt;ul&gt;、&lt;ol&gt;、&lt;li&gt;：无序/有序列表
+&lt;table&gt;、&lt;tr&gt;、&lt;td&gt;：表格</code></pre>
+            <p><strong>示例</strong>：</p>
+            <pre><code>&lt;h1&gt;主标题&lt;/h1&gt;
+&lt;p&gt;这是一个段落。&lt;/p&gt;
+&lt;a href="https://example.com"&gt;点击跳转&lt;/a&gt;</code></pre>
+        </details>
+        <details>
+            <summary>3. HTML属性</summary>
+            <p>属性为标签提供额外信息，写在开始标签内，格式为 <code>name="value"</code>。</p>
+            <pre><code>&lt;a href="https://example.com" target="_blank"&gt;打开新窗口&lt;/a&gt;
+&lt;img src="image.jpg" alt="图片描述" width="200"&gt;</code></pre>
+            <p><strong>常用属性</strong>：
+                <ul>
+                    <li><code>id</code>：唯一标识符</li>
+                    <li><code>class</code>：样式类</li>
+                    <li><code>style</code>：内联CSS</li>
+                    <li><code>title</code>：提示文本</li>
+                </ul>
+            </p>
+        </details>
+        <details>
+            <summary>4. 嵌入CSS样式</summary>
+            <p>可以在&lt;head&gt;或&lt;style&gt;标签中添加CSS，也可以使用内联样式。</p>
+            <pre><code>&lt;style&gt;
+    h1 { color: blue; }
+    .my-class { font-size: 16px; }
+&lt;/style&gt;
+&lt;!-- 或内联样式 --&gt;
+&lt;p style="color: red;"&gt;红色文本&lt;/p&gt;</code></pre>
+        </details>
+        <details>
+            <summary>5. 嵌入JavaScript</summary>
+            <p>使用&lt;script&gt;标签嵌入JavaScript代码，通常放在&lt;body&gt;底部或&lt;head&gt;内。</p>
+            <pre><code>&lt;script&gt;
+    alert('Hello, World!');
+&lt;/script&gt;</code></pre>
+            <p><strong>注意</strong>：复杂的JavaScript逻辑建议放在外部文件，通过&lt;script src="file.js"&gt;引入。</p>
+        </details>
+        <details>
+            <summary>6. HTML注释</summary>
+            <p>使用&lt;!-- 注释内容 --&gt;添加注释，注释不会显示在页面上。</p>
+            <pre><code>&lt;!-- 这是一个注释 --&gt;</code></pre>
+        </details>
+        <details>
+            <summary>7. 常见问题与提示</summary>
+            <p>
+                <ul>
+                    <li>确保标签正确嵌套，避免交叉嵌套（如&lt;p&gt;&lt;span&gt;&lt;/p&gt;&lt;/span&gt;）。</li>
+                    <li>属性值需用引号包裹（如href="URL"）。</li>
+                    <li>图片路径需正确，建议使用相对路径或完整URL。</li>
+                    <li>预览中的JavaScript可能受iframe安全限制影响，复杂功能需导出后测试。</li>
+                </ul>
+            </p>
+        </details>
+    </div>
+
+    <!-- 引入CodeMirror JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/xml/xml.min.js"></script>
+    <script>
+        // 初始化CodeMirror
+        const editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'), {
+            mode: 'xml',
+            lineNumbers: true,
+            theme: 'default',
+            viewportMargin: Infinity
+        });
+
+        // 实时预览
+        function updatePreview() {
+            const previewFrame = document.getElementById('previewFrame').contentWindow.document;
+            previewFrame.open();
+            previewFrame.write(editor.getValue());
+            previewFrame.close();
+        }
+
+        // 初次渲染预览
+        updatePreview();
+
+        // 编辑器内容变化时更新预览
+        editor.on('change', updatePreview);
+
+        // 复制代码
+        function copyCode() {
+            const code = editor.getValue();
+            navigator.clipboard.write(code).then(() => {
+                alert('代码已复制到剪贴板！');
+            }).catch(err => {
+                alert('复制失败：' + err);
+            });
+        }
+
+        // 导出HTML文件
+        function exportHTML() {
+            const code = editor.getValue();
+            const blob = new Blob([code], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'output.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
