@@ -604,6 +604,10 @@
                                 <div class="template-title">基础页面</div>
                                 <div class="template-desc">包含基本HTML结构的简单页面模板</div>
                             </div>
+                            <div class="template-item" onclick="loadTemplate('aab')">
+                                <div class="template-title">测试页面</div>
+                                <div class="template-desc">包含基本HTML结构的简单页面模板（测试）</div>
+                            </div>
                             <div class="template-item" onclick="loadTemplate('blog')">
                                 <div class="template-title">博客文章</div>
                                 <div class="template-desc">适合博客和文章展示的布局模板</div>
@@ -924,7 +928,45 @@ function showAlert() {
     </div>
 </body>
 </html>`,
-
+                aab: `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基础页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        p {
+            line-height: 1.6;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>欢迎来到我的网站</h1>
+        <p>这是一个基础的HTML页面模板，包含了基本的样式和结构。您可以在此基础上进行扩展和定制。</p>
+        <p>页面采用了简洁的设计风格，具有良好的可读性和用户体验。</p>
+    </div>
+</body>
+</html>`,
                 blog: `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
