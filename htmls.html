@@ -620,6 +620,18 @@
                                 <div class="template-title">博客文章</div>
                                 <div class="template-desc">适合博客和文章展示的布局模板</div>
                             </div>
+                            <div class="template-item" onclick="loadTemplate('aae')">
+                                <div class="template-title">卡片式博客模板</div>
+                                <div class="template-desc">卡片布局模板</div>
+                            </div>
+                            <div class="template-item" onclick="loadTemplate('aac')">
+                                <div class="template-title">沉浸式博客文章模板</div>
+                                <div class="template-desc">沉浸式博客文章模板</div>
+                            </div>
+                            <div class="template-item" onclick="loadTemplate('aac')">
+                                <div class="template-title">交互式博客文章模板</div>
+                                <div class="template-desc">交互式博客文章模板</div>
+                            </div>
                             <div class="template-item" onclick="loadTemplate('landing')">
                                 <div class="template-title">着陆页</div>
                                 <div class="template-desc">现代化的产品着陆页面模板</div>
@@ -1318,6 +1330,390 @@ fetchData();
     </footer>
 </body>
 </html>`,
+                 aae: `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>卡片式博客 - 每日灵感</title>
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #e9ecef;
+        }
+        .header {
+            background: #0984e3;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 0 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .card-content {
+            padding: 20px;
+        }
+        .card h2 {
+            font-size: 1.5rem;
+            margin: 0 0 10px;
+            color: #2d3436;
+        }
+        .meta {
+            font-size: 0.85rem;
+            color: #636e72;
+            margin-bottom: 15px;
+        }
+        .card p {
+            color: #2d3436;
+            margin-bottom: 15px;
+        }
+        .card a {
+            color: #0984e3;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .card a:hover {
+            text-decoration: underline;
+        }
+        .footer {
+            background: #2d3436;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>每日灵感</h1>
+    </header>
+    
+    <div class="container">
+        <article class="card">
+            <img src="article1.jpg" alt="文章1插图">
+            <div class="card-content">
+                <h2>如何提升前端开发效率</h2>
+                <div class="meta">
+                    发布时间: 2025年6月2日 | 作者: 小明
+                </div>
+                <p>探索现代前端工具如Vite和ESBuild，显著提升开发效率。</p>
+                <a href="#read-more">阅读全文</a>
+            </div>
+        </article>
+        <article class="card">
+            <img src="article2.jpg" alt="文章2插图">
+            <div class="card-content">
+                <h2>CSS动画的魅力</h2>
+                <div class="meta">
+                    发布时间: 2025年6月1日 | 作者: 小红
+                </div>
+                <p>通过CSS动画为网页添加生动的交互效果，提升用户体验。</p>
+                <a href="#read-more">阅读全文</a>
+            </div>
+        </article>
+        <article class="card">
+            <img src="article3.jpg" alt="文章3插图">
+            <div class="card-content">
+                <h2>学习TypeScript的5个理由</h2>
+                <div class="meta">
+                    发布时间: 2025年5月30日 | 作者: 小刚
+                </div>
+                <p>TypeScript为JavaScript开发带来类型安全和更好的可维护性。</p>
+                <a href="#read-more">阅读全文</a>
+            </div>
+        </article>
+    </div>
+    
+    <footer class="footer">
+        <p>&copy; 2025 每日灵感. 保留所有权利.</p>
+    </footer>
+</body>
+</html>`，
+                aaf: `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>沉浸式博客 - 创意笔记</title>
+    <style>
+        body {
+            font-family: 'Playfair Display', serif;
+            line-height: 1.8;
+            margin: 0;
+            padding: 0;
+            background: url('background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+        }
+        .header {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 80px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 3rem;
+            margin: 0;
+        }
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 12px;
+        }
+        .article h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        .meta {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        .article h2 {
+            color: #fff;
+            margin-top: 30px;
+        }
+        .article p {
+            margin-bottom: 20px;
+        }
+        .article img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .footer {
+            background: rgba(0, 0, 0, 0.5);
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>创意笔记</h1>
+        <p>记录艺术与灵感的瞬间</p>
+    </header>
+    
+    <div class="container">
+        <article class="article">
+            <h1>摄影中的光影艺术</h1>
+            <div class="meta">
+                发布时间: 2025年6月2日 | 作者: 小白
+            </div>
+            <img src="photo.jpg" alt="光影摄影">
+            
+            <h2>引言</h2>
+            <p>光影是摄影的灵魂，掌握光线可以让平凡的场景变得非凡。</p>
+            
+            <h2>技巧分享</h2>
+            <p>利用黄金时段的自然光，或通过人工光源创造戏剧性效果，都是摄影师的常用技巧。</p>
+            
+            <h2>案例展示</h2>
+            <p>例如，逆光拍摄可以营造出梦幻的轮廓光效果。</p>
+        </article>
+    </div>
+    
+    <footer class="footer">
+        <p>&copy; 2025 创意笔记. 保留所有权利.</p>
+    </footer>
+</body>
+</html>`，
+                 aag: `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交互式博客 - 技术洞察</title>
+    <style>
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+        }
+        .header {
+            background: #1e90ff;
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        }
+        .article h1 {
+            font-size: 2rem;
+            color: #2d3436;
+        }
+        .meta {
+            font-size: 0.9rem;
+            color: #636e72;
+            margin-bottom: 20px;
+        }
+        .article h2 {
+            color: #2d3436;
+            margin-top: 30px;
+        }
+        .article p {
+            margin-bottom: 20px;
+        }
+        .comments {
+            margin-top: 40px;
+        }
+        .comments h3 {
+            color: #2d3436;
+            margin-bottom: 20px;
+        }
+        .comment-form {
+            margin-bottom: 30px;
+        }
+        .comment-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .comment-form input, .comment-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .comment-form button {
+            padding: 10px 20px;
+            background: #1e90ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .comment-form button:hover {
+            background: #1873cc;
+        }
+        .comment {
+            border-top: 1px solid #ddd;
+            padding: 15px 0;
+        }
+        .footer {
+            background: #2d3436;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>技术洞察</h1>
+    </header>
+    
+    <div class="container">
+        <article class="article">
+            <h1>深入探索Web性能优化</h1>
+            <div class="meta">
+                发布时间: 2025年6月2日 | 作者: 小刚
+            </div>
+            
+            <h2>引言</h2>
+            <p>网页性能直接影响用户体验，优化加载速度是开发者的必修课。</p>
+            
+            <h2>优化技巧</h2>
+            <p>包括图片懒加载、减少HTTP请求和使用CDN加速等方法。</p>
+            
+            <h2>工具推荐</h2>
+            <ul>
+                <li>Lighthouse：分析网页性能</li>
+                <li>Webpack：打包优化</li>
+                <li>Cloudflare：CDN服务</li>
+            </ul>
+        </article>
+        
+        <section class="comments">
+            <h3>评论区</h3>
+            <form class="comment-form">
+                <label for="name">姓名</label>
+                <input type="text" id="name" name="name" required>
+                <label for="comment">评论</label>
+                <textarea id="comment" name="comment" rows="4" required></textarea>
+                <button type="submit">提交评论</button>
+            </form>
+            <div class="comment">
+                <p><strong>用户1</strong>: 感谢分享，Lighthouse真的很好用！</p>
+                <p><small>2025年6月2日</small></p>
+            </div>
+        </section>
+    </div>
+    
+    <footer class="footer">
+        <p>&copy; 2025 技术洞察. 保留所有权利.</p>
+    </footer>
+</body>
+</html>`，
                     
                 blog: `<!DOCTYPE html>
 <html lang="zh-CN">
