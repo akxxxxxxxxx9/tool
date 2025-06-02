@@ -3,242 +3,1501 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML编辑器与预览</title>
+    <title>增强版HTML编辑器与预览</title>
     <!-- 引入CodeMirror CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/theme/material.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/fold/foldgutter.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/dialog/dialog.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #6366f1;
+            --accent-color: #8b5cf6;
+            --background: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --border: #475569;
+            --border-light: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .container {
-            display: flex;
-            gap: 20px;
-            height: 70vh;
-        }
-        .editor, .preview {
-            flex: 1;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--background) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            height: 100vh;
             overflow: hidden;
         }
-        .preview iframe {
-            width: 100%;
-            height: 100%;
+
+        .app-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
             border: none;
-        }
-        .controls {
-            margin-bottom: 10px;
-        }
-        button {
-            padding: 10px 20px;
-            margin-right: 10px;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
         }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--surface-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+            transform: translateY(-1px);
+        }
+
+        .btn-icon {
+            padding: 0.5rem;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+        }
+
+        .btn-icon:hover {
+            background: var(--surface-light);
+            color: var(--text-primary);
+        }
+
+        .theme-selector {
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            background: var(--surface-light);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 5rem);
+            gap: 0.5rem;
+            padding: 0.5rem;
+        }
+
+        .editor-panel, .preview-panel {
+            flex: 1;
+            background: var(--surface);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .panel-header {
+            background: var(--surface-light);
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .status-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
         .CodeMirror {
-            height: 100% !important;
+            height: calc(100% - 3rem) !important;
             font-size: 14px;
+            font-family: 'Fira Code', 'Monaco', 'Cascadia Code', monospace;
+            line-height: 1.5;
         }
-        .guide {
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            max-height: 200px;
-            overflow-y: auto;
+
+        .preview-frame {
+            width: 100%;
+            height: calc(100% - 3rem);
+            border: none;
+            background: white;
         }
-        .guide details {
-            margin-bottom: 10px;
+
+        .sidebar {
+            width: 320px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
-        .guide summary {
+
+        .sidebar-tabs {
+            display: flex;
+            background: var(--surface-light);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 0.75rem;
+            text-align: center;
             cursor: pointer;
-            font-weight: bold;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-bottom: 2px solid transparent;
         }
-        .guide p, .guide pre {
-            margin: 10px 0;
+
+        .sidebar-tab.active {
+            background: var(--surface);
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
         }
-        .guide pre {
-            background: #f4f4f4;
-            padding: 10px;
-            border-radius: 5px;
+
+        .sidebar-tab:hover:not(.active) {
+            background: var(--border);
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .guide-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .guide-section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .guide-section pre {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            margin: 0.75rem 0;
+        }
+
+        .guide-section code {
+            background: var(--background);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .shortcuts-grid {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .shortcut-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            background: var(--background);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+
+        .shortcut-key {
+            background: var(--surface-light);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+            font-size: 0.75rem;
+            border: 1px solid var(--border);
+        }
+
+        .templates-grid {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .template-item {
+            padding: 1rem;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .template-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .template-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .template-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .toast {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--error);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 280px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: 40%;
+            }
+            
+            .app-header {
+                padding: 1rem;
+            }
+            
+            .toolbar {
+                gap: 0.25rem;
+            }
+            
+            .btn {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--surface);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-light);
         }
     </style>
 </head>
 <body>
-    <div class="controls">
-        <button onclick="copyCode()">复制代码</button>
-        <button onclick="exportHTML()">导出HTML</button>
+    <div class="app-header">
+        <h1 class="app-title">🚀 HTML Studio</h1>
+        <div class="toolbar">
+            <button class="btn btn-primary" onclick="saveFile()">
+                💾 保存
+            </button>
+            <button class="btn btn-secondary" onclick="copyCode()">
+                📋 复制
+            </button>
+            <button class="btn btn-secondary" onclick="exportHTML()">
+                📤 导出
+            </button>
+            <button class="btn btn-icon" onclick="toggleFullscreen()" title="全屏预览">
+                🔍
+            </button>
+            <select class="theme-selector" onchange="changeTheme(this.value)">
+                <option value="material">Material Dark</option>
+                <option value="monokai">Monokai</option>
+                <option value="default">Default</option>
+            </select>
+        </div>
     </div>
-    <div class="container">
-        <div class="editor">
+
+    <div class="main-container">
+        <div class="editor-panel">
+            <div class="panel-header">
+                <span>📝 HTML 编辑器</span>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span id="lineCount">行: 1 | 列: 1</span>
+                </div>
+            </div>
             <textarea id="codeEditor"><!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<header>
-  <h1>我的网站标题</h1>
-  <nav>
-    <a href="#home">首页</a>
-    <a href="#about">关于</a>
-    <a href="#contact">联系</a>
-  </nav>
-</header>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的精美网页</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .hero {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 1.25rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
 <body>
-    <h1 style="color: #ff6600;">欢迎体验HTML编辑器</h1>
-    <p>
-  <span style="color: red;">在</span>
-  <span style="color: orange;">这</span>
-  <span style="color: yellow;">里</span>
-  <span style="color: green;">编</span>
-  <span style="color: blue;">写</span>
-  <span style="color: indigo;">H</span>
-  <span style="color: violet;">T</span>
-  <span style="color: teal;">M</span>
-  <span style="color: brown;">L</span>
-  <span>代码，实时预览效果！</span>
-</p>
+    <div class="container">
+        <div class="hero">
+            <h1>🌟 欢迎来到我的网站</h1>
+            <p>这是一个使用现代HTML和CSS技术构建的精美网页，展示了渐变背景、卡片设计和响应式布局等特性。</p>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3>现代设计</h3>
+                <p>采用现代化的UI设计理念，包含渐变色彩、阴影效果和流畅的动画。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>响应式布局</h3>
+                <p>完美适配各种设备尺寸，从手机到桌面端都能提供优秀的用户体验。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>高性能</h3>
+                <p>优化的CSS和HTML结构确保快速加载和流畅的用户交互体验。</p>
+            </div>
+        </div>
+    </div>
 </body>
 </html></textarea>
         </div>
-        <div class="preview">
-            <iframe id="previewFrame"></iframe>
+
+        <div class="preview-panel">
+            <div class="panel-header">
+                <span>👁️ 实时预览</span>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>实时同步</span>
+                </div>
+            </div>
+            <iframe class="preview-frame" id="previewFrame"></iframe>
         </div>
-    </div>
-    <div class="guide">
-        <h2>HTML语法使用说明</h2>
-        <details>
-            <summary>1. HTML基础结构</summary>
-            <p>HTML文档的基本结构包括以下部分：</p>
-            <pre><code>&lt;!DOCTYPE html&gt;
+
+        <div class="sidebar">
+            <div class="sidebar-tabs">
+                <div class="sidebar-tab active" onclick="switchTab('shortcuts')">快捷键</div>
+                <div class="sidebar-tab" onclick="switchTab('templates')">模板</div>
+                <div class="sidebar-tab" onclick="switchTab('guide')">指南</div>
+            </div>
+            
+            <div class="sidebar-content">
+                <div id="shortcuts-tab" class="tab-content">
+                    <div class="guide-section">
+                        <h3>⌨️ 编辑快捷键</h3>
+                        <div class="shortcuts-grid">
+                            <div class="shortcut-item">
+                                <span>保存</span>
+                                <kbd class="shortcut-key">Ctrl+S</kbd>
+                            </div>
+                            <div class="shortcut-item">
+                                <span>复制</span>
+                                <kbd class="shortcut-key">Ctrl+C</kbd>
+                            </div>
+                            <div class="shortcut-item">
+                                <span>粘贴</span>
+                                <kbd class="shortcut-key">Ctrl+V</kbd>
+                            </div>
+                            <div class="shortcut-item">
+                                <span>撤销</span>
+                                <kbd class="shortcut-key">Ctrl+Z</kbd>
+                            </div>
+                            <div class="shortcut-item">
+                                <span>重做</span>
+                                <kbd class="shortcut-key">Ctrl+Y</kbd>
+                            </div>
+                            <div class="shortcut-item">
+                                <span>查找</span>
+                                <kbd class="shortcut-key">Ctrl+F</kbd>
+                            </div>
+                            <div class="shortcut-item">
+                                <span>替换</span>
+                                <kbd class="shortcut-key">Ctrl+H</kbd>
+                            </div>
+                            <div class="shortcut-item">
+                                <span>全选</span>
+                                <kbd class="shortcut-key">Ctrl+A</kbd>
+                            </div>
+                            <div class="shortcut-item">
+                                <span>格式化代码</span>
+                                <kbd class="shortcut-key">Ctrl+Alt+F</kbd>
+                            </div>
+                            <div class="shortcut-item">
+                                <span>跳转到行</span>
+                                <kbd class="shortcut-key">Ctrl+G</kbd>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="templates-tab" class="tab-content hidden">
+                    <div class="guide-section">
+                        <h3>📄 HTML模板</h3>
+                        <div class="templates-grid">
+                            <div class="template-item" onclick="loadTemplate('basic')">
+                                <div class="template-title">基础页面</div>
+                                <div class="template-desc">包含基本HTML结构的简单页面模板</div>
+                            </div>
+                            <div class="template-item" onclick="loadTemplate('blog')">
+                                <div class="template-title">博客文章</div>
+                                <div class="template-desc">适合博客和文章展示的布局模板</div>
+                            </div>
+                            <div class="template-item" onclick="loadTemplate('landing')">
+                                <div class="template-title">着陆页</div>
+                                <div class="template-desc">现代化的产品着陆页面模板</div>
+                            </div>
+                            <div class="template-item" onclick="loadTemplate('portfolio')">
+                                <div class="template-title">作品集</div>
+                                <div class="template-desc">展示个人作品和项目的组合页面</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="guide-tab" class="tab-content hidden">
+                    <div class="guide-section">
+                        <h3>📚 HTML基础</h3>
+                        <p>HTML是网页的骨架，定义了内容的结构和语义。</p>
+                        <pre><code>&lt;!DOCTYPE html&gt;
 &lt;html lang="zh-CN"&gt;
 &lt;head&gt;
     &lt;meta charset="UTF-8"&gt;
-    &lt;title&gt;网页标题&lt;/title&gt;
+    &lt;title&gt;页面标题&lt;/title&gt;
 &lt;/head&gt;
 &lt;body&gt;
-    &lt;!-- 内容写在这里 --&gt;
+    &lt;h1&gt;主标题&lt;/h1&gt;
+    &lt;p&gt;段落内容&lt;/p&gt;
 &lt;/body&gt;
 &lt;/html&gt;</code></pre>
-            <p><strong>说明</strong>：&lt;!DOCTYPE html&gt;声明HTML5文档，&lt;html&gt;是根元素，&lt;head&gt;包含元数据，&lt;body&gt;包含网页可见内容。</p>
-        </details>
-        <details>
-            <summary>2. 常用HTML标签</summary>
-            <p>以下是常用的HTML标签及其用途：</p>
-            <pre><code>&lt;h1&gt;至&lt;h6&gt;：标题（从大到小）
-&lt;p&gt;：段落
-&lt;a href="URL"&gt;：超链接
-&lt;img src="图片路径" alt="描述"&gt;：图片
-&lt;imgs src="img src="图片路径" alt="描述" width="300" height="200""&gt;：图片2
-&lt;div&gt;：块级容器
-&lt;span&gt;：内联容器
-&lt;it&gt;:notes                
-&lt;ul&gt;、&lt;ol&gt;、&lt;li&gt;：无序/有序列表
-&lt;table&gt;、&lt;tr&gt;、&lt;td&gt;：表格</code></pre>
-            <p><strong>示例</strong>：</p>
-            <pre><code>&lt;h1&gt;主标题&lt;/h1&gt;
-&lt;p&gt;这是一个段落。&lt;/p&gt;
-&lt;a href="https://example.com"&gt;点击跳转&lt;/a&gt;</code></pre>
-        </details>
-        <details>
-            <summary>3. HTML属性</summary>
-            <p>属性为标签提供额外信息，写在开始标签内，格式为 <code>name="value"</code>。</p>
-            <pre><code>&lt;a href="https://example.com" target="_blank"&gt;打开新窗口&lt;/a&gt;
-&lt;img src="image.jpg" alt="图片描述" width="200"&gt;</code></pre>
-            <p><strong>常用属性</strong>：
-                <ul>
-                    <li><code>id</code>：唯一标识符</li>
-                    <li><code>class</code>：样式类</li>
-                    <li><code>style</code>：内联CSS</li>
-                    <li><code>title</code>：提示文本</li>
-                </ul>
-            </p>
-        </details>
-        <details>
-            <summary>4. 嵌入CSS样式</summary>
-            <p>可以在&lt;head&gt;或&lt;style&gt;标签中添加CSS，也可以使用内联样式。</p>
-            <pre><code>&lt;style&gt;
-    h1 { color: blue; }
-    .my-class { font-size: 16px; }
-&lt;/style&gt;
-&lt;!-- 或内联样式 --&gt;
-&lt;p style="color: red;"&gt;红色文本&lt;/p&gt;</code></pre>
-        </details>
-        <details>
-            <summary>5. 嵌入JavaScript</summary>
-            <p>使用&lt;script&gt;标签嵌入JavaScript代码，通常放在&lt;body&gt;底部或&lt;head&gt;内。</p>
-            <pre><code>&lt;script&gt;
+                    </div>
+
+                    <div class="guide-section">
+                        <h3>🎨 CSS样式</h3>
+                        <p>CSS用于控制网页的外观和布局。</p>
+                        <pre><code>&lt;style&gt;
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+h1 {
+    color: #333;
+    text-align: center;
+}
+&lt;/style&gt;</code></pre>
+                    </div>
+
+                    <div class="guide-section">
+                        <h3>⚡ JavaScript交互</h3>
+                        <p>JavaScript为网页添加动态行为和交互功能。</p>
+                        <pre><code>&lt;script&gt;
+function showAlert() {
     alert('Hello, World!');
+}
 &lt;/script&gt;</code></pre>
-            <p><strong>注意</strong>：复杂的JavaScript逻辑建议放在外部文件，通过&lt;script src="file.js"&gt;引入。</p>
-        </details>
-        <details>
-            <summary>6. HTML注释</summary>
-            <p>使用&lt;!-- 注释内容 --&gt;添加注释，注释不会显示在页面上。</p>
-            <pre><code>&lt;!-- 这是一个注释 --&gt;</code></pre>
-        </details>
-        <details>
-            <summary>7. 常见问题与提示</summary>
-            <p>
-                <ul>
-                    <li>确保标签正确嵌套，避免交叉嵌套（如&lt;p&gt;&lt;span&gt;&lt;/p&gt;&lt;/span&gt;）。</li>
-                    <li>属性值需用引号包裹（如href="URL"）。</li>
-                    <li>图片路径需正确，建议使用相对路径或完整URL。</li>
-                    <li>预览中的JavaScript可能受iframe安全限制影响，复杂功能需导出后测试。</li>
-                </ul>
-            </p>
-        </details>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- 引入CodeMirror JS -->
+    <!-- Toast 通知 -->
+    <div id="toast" class="toast">
+        <div id="toast-message"></div>
+    </div>
+
+    <!-- 引入CodeMirror相关JS文件 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/edit/closetag.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/fold/foldcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/fold/foldgutter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/fold/xml-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/dialog/dialog.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/search/searchcursor.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/search/search.min.js"></script>
+
     <script>
-        // 初始化CodeMirror
+        // 初始化CodeMirror编辑器
         const editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'), {
-            mode: 'xml',
+            mode: 'htmlmixed',
             lineNumbers: true,
-            theme: 'default',
-            viewportMargin: Infinity
+            theme: 'material',
+            indentUnit: 2,
+            tabSize: 2,
+            lineWrapping: true,
+            autoCloseTags: true,
+            autoCloseBrackets: true,
+            foldGutter: true,
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+            extraKeys: {
+                "Ctrl-S": function(cm) {
+                    saveFile();
+                    return false;
+                },
+                "Ctrl-Alt-F": function(cm) {
+                    formatCode();
+                },
+                "Ctrl-/": "toggleComment",
+                "F11": function(cm) {
+                    cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+                },
+                "Esc": function(cm) {
+                    if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                }
+            }
         });
 
-        // 实时预览
+        // 实时预览功能
         function updatePreview() {
-            const previewFrame = document.getElementById('previewFrame').contentWindow.document;
-            previewFrame.open();
-            previewFrame.write(editor.getValue());
-            previewFrame.close();
-        }
-
-        // 初次渲染预览
-        updatePreview();
-
-        // 编辑器内容变化时更新预览
-        editor.on('change', updatePreview);
-
-        // 复制代码
-        function copyCode() {
+            const previewFrame = document.getElementById('previewFrame');
             const code = editor.getValue();
-            navigator.clipboard.write(code).then(() => {
-                alert('代码已复制到剪贴板！');
-            }).catch(err => {
-                alert('复制失败：' + err);
-            });
+            
+            // 创建一个新的文档内容
+            const doc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+            doc.open();
+            doc.write(code);
+            doc.close();
         }
 
-        // 导出HTML文件
-        function exportHTML() {
+        // 更新行列信息
+        function updateLineInfo() {
+            const cursor = editor.getCursor();
+            const lineCount = editor.lineCount();
+            document.getElementById('lineCount').textContent = 
+                `行: ${cursor.line + 1} | 列: ${cursor.ch + 1} | 总行数: ${lineCount}`;
+        }
+
+        // 监听编辑器变化
+        editor.on('change', function(cm, change) {
+            updatePreview();
+            updateLineInfo();
+        });
+
+        editor.on('cursorActivity', function(cm) {
+            updateLineInfo();
+        });
+
+        // 初始化
+        updatePreview();
+        updateLineInfo();
+
+        // 显示Toast通知
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const messageEl = document.getElementById('toast-message');
+            
+            messageEl.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // 保存文件
+        function saveFile() {
             const code = editor.getValue();
             const blob = new Blob([code], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'output.html';
+            a.download = `html-project-${new Date().getTime()}.html`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            showToast('文件保存成功！');
         }
+
+        // 复制代码
+        async function copyCode() {
+            try {
+                const code = editor.getValue();
+                await navigator.clipboard.writeText(code);
+                showToast('代码已复制到剪贴板！');
+            } catch (err) {
+                showToast('复制失败，请手动复制', 'error');
+            }
+        }
+
+        // 导出HTML
+        function exportHTML() {
+            saveFile();
+        }
+
+        // 格式化代码
+        function formatCode() {
+            const code = editor.getValue();
+            // 简单的格式化逻辑
+            const formatted = code
+                .replace(/></g, '>\n<')
+                .replace(/^\s*\n/gm, '')
+                .split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0)
+                .map((line, index, arr) => {
+                    let indent = 0;
+                    for (let i = 0; i < index; i++) {
+                        if (arr[i].match(/<(?!\/)[^>]*(?<!\/|br|hr|img|input|meta|link)>$/)) {
+                            indent++;
+                        }
+                        if (arr[i].match(/<\/[^>]+>$/)) {
+                            indent--;
+                        }
+                    }
+                    if (line.match(/^<\/[^>]+>$/)) {
+                        indent--;
+                    }
+                    return '  '.repeat(Math.max(0, indent)) + line;
+                })
+                .join('\n');
+            
+            editor.setValue(formatted);
+            showToast('代码格式化完成！');
+        }
+
+        // 切换主题
+        function changeTheme(theme) {
+            editor.setOption('theme', theme);
+            showToast(`主题已切换为 ${theme}`);
+        }
+
+        // 全屏预览
+        function toggleFullscreen() {
+            const previewPanel = document.querySelector('.preview-panel');
+            const editorPanel = document.querySelector('.editor-panel');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (previewPanel.style.position === 'fixed') {
+                // 退出全屏
+                previewPanel.style.position = '';
+                previewPanel.style.top = '';
+                previewPanel.style.left = '';
+                previewPanel.style.width = '';
+                previewPanel.style.height = '';
+                previewPanel.style.zIndex = '';
+                previewPanel.style.background = '';
+                editorPanel.style.display = '';
+                sidebar.style.display = '';
+            } else {
+                // 进入全屏
+                previewPanel.style.position = 'fixed';
+                previewPanel.style.top = '0';
+                previewPanel.style.left = '0';
+                previewPanel.style.width = '100vw';
+                previewPanel.style.height = '100vh';
+                previewPanel.style.zIndex = '9999';
+                previewPanel.style.background = 'var(--surface)';
+                editorPanel.style.display = 'none';
+                sidebar.style.display = 'none';
+            }
+        }
+
+        // 切换侧边栏标签
+        function switchTab(tabName) {
+            // 移除所有active类
+            document.querySelectorAll('.sidebar-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 隐藏所有内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // 激活当前标签
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.remove('hidden');
+        }
+
+        // 加载模板
+        function loadTemplate(templateName) {
+            const templates = {
+                basic: `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基础页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        p {
+            line-height: 1.6;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>欢迎来到我的网站</h1>
+        <p>这是一个基础的HTML页面模板，包含了基本的样式和结构。您可以在此基础上进行扩展和定制。</p>
+        <p>页面采用了简洁的设计风格，具有良好的可读性和用户体验。</p>
+    </div>
+</body>
+</html>`,
+
+                blog: `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客文章 - 我的博客</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.8;
+            margin: 0;
+            padding: 0;
+            background-color: #fafafa;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        .header p {
+            margin: 10px 0 0;
+            opacity: 0.9;
+        }
+        .container {
+            max-width: 800px;
+            margin: -30px auto 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .article {
+            padding: 40px;
+        }
+        .article h2 {
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .article p {
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .meta {
+            color: #999;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+        }
+        .footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>我的技术博客</h1>
+        <p>分享编程经验与技术见解</p>
+    </div>
+    
+    <div class="container">
+        <article class="article">
+            <h1>如何构建现代化的网页</h1>
+            <div class="meta">
+                发布时间: 2024年1月1日 | 作者: 开发者
+            </div>
+            
+            <h2>前言</h2>
+            <p>在现代Web开发中，构建一个优秀的网页需要考虑多个方面：用户体验、性能优化、响应式设计等。本文将介绍一些最佳实践。</p>
+            
+            <h2>设计原则</h2>
+            <p>优秀的网页设计应该遵循以下原则：</p>
+            <ul>
+                <li>简洁明了的布局</li>
+                <li>一致的视觉风格</li>
+                <li>良好的可访问性</li>
+                <li>快速的加载速度</li>
+            </ul>
+            
+            <h2>技术实现</h2>
+            <p>使用HTML5、CSS3和现代JavaScript框架可以帮助我们构建更好的用户体验。同时，响应式设计确保网页在各种设备上都能正常显示。</p>
+            
+            <h2>总结</h2>
+            <p>构建现代化网页是一个持续学习和改进的过程。通过不断实践和学习新技术，我们可以创造出更优秀的Web体验。</p>
+        </article>
+    </div>
+    
+    <div class="footer">
+        <p>&copy; 2024 我的博客. 保留所有权利.</p>
+    </div>
+</body>
+</html>`,
+
+                landing: `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品着陆页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+        }
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 20px;
+        }
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease;
+        }
+        .hero-content p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+        .cta-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        .features {
+            padding: 80px 20px;
+            background: #f8f9fa;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+        .feature {
+            text-align: center;
+            padding: 40px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .feature:hover {
+            transform: translateY(-10px);
+        }
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        .feature h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .feature p {
+            color: #666;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .section-subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div class="hero-content">
+            <h1>🚀 创新产品</h1>
+            <p>革命性的解决方案，让您的工作更高效、更智能</p>
+            <a href="#features" class="cta-button">了解更多</a>
+        </div>
+    </section>
+    
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">为什么选择我们？</h2>
+            <p class="section-subtitle">我们的产品具有以下核心优势，帮助您实现更好的业务成果</p>
+            
+            <div class="features-grid">
+                <div class="feature">
+                    <div class="feature-icon">⚡</div>
+                    <h3>极速体验</h3>
+                    <p>采用最新技术架构，提供闪电般的响应速度，让您的工作效率提升10倍。</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>安全可靠</h3>
+                    <p>企业级安全保障，多重加密技术确保您的数据安全无忧。</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🎯</div>
+                    <h3>精准智能</h3>
+                    <p>AI驱动的智能分析，为您提供精准的数据洞察和决策支持。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>`,
+
+                portfolio: `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人作品集</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 100px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        .nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+        .nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .nav a:hover {
+            color: #3498db;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .section {
+            padding: 80px 0;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+            color: #2c3e50;
+        }
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+        .project-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .project-image {
+            height: 200px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+        }
+        .project-content {
+            padding: 30px;
+        }
+        .project-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .project-content p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .tag {
+            background: #ecf0f1;
+            color: #2c3e50;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        .about {
+            background: #f8f9fa;
+        }
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 60px;
+            align-items: center;
+        }
+        .about-text {
+            font-size: 1.1rem;
+            color: #555;
+        }
+        .skills-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .skill-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            .nav ul {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>👋 我是张设计师</h1>
+        <p>专注于用户体验设计与前端开发</p>
+    </header>
+    
+    <nav class="nav">
+        <ul>
+            <li><a href="#projects">作品集</a></li>
+            <li><a href="#about">关于我</a></li>
+            <li><a href="#contact">联系方式</a></li>
+        </ul>
+    </nav>
+    
+    <section class="section" id="projects">
+        <div class="container">
+            <h2 class="section-title">我的作品</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <div class="project-image">🎨</div>
+                    <div class="project-content">
+                        <h3>电商平台设计</h3>
+                        <p>为某知名品牌设计的全新电商平台，提升了用户转化率30%，获得了客户的高度认可。</p>
+                        <div class="project-tags">
+                            <span class="tag">UI设计</span>
+                            <span class="tag">用户体验</span>
+                            <span class="tag">响应式</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="project-card">
+                    <div class="project-image">📱</div>
+                    <div class="project-content">
+                        <h3>移动应用界面</h3>
+                        <p>简洁直观的移动应用界面设计，注重用户操作的便捷性和视觉的美观性。</p>
+                        <div class="project-tags">
+                            <span class="tag">移动端</span>
+                            <span class="tag">原型设计</span>
+                            <span class="tag">交互设计</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="project-card">
+                    <div class="project-image">🌐</div>
+                    <div class="project-content">
+                        <h3>企业官网重设</h3>
+                        <p>为传统企业打造现代化官网，融合品牌特色与现代设计理念，提升企业形象。</p>
+                        <div class="project-tags">
+                            <span class="tag">网页设计</span>
+                            <span class="tag">品牌设计</span>
+                            <span class="tag">前端开发</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="section about" id="about">
+        <div class="container">
+            <h2 class="section-title">关于我</h2>
+            <div class="about-content">
+                <div>
+                    <div style="width: 200px; height: 200px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 4rem; color: white;">👨‍💻</div>
+                </div>
+                <div class="about-text">
+                    <p>我是一名充满热情的设计师和开发者，拥有5年的用户体验设计经验。我专注于创造既美观又实用的数字产品，相信好的设计能够改变人们的生活方式。</p>
+                    <p>我的设计理念是"以用户为中心"，通过深入了解用户需求，创造出真正有价值的产品体验。</p>
+                    
+                    <div class="skills-list">
+                        <div class="skill-item">
+                            <strong>UI/UX 设计</strong>
+                        </div>
+                        <div class="skill-item">
+                            <strong>前端开发</strong>
+                        </div>
+                        <div class="skill-item">
+                            <strong>原型设计</strong>
+                        </div>
+                        <div class="skill-item">
+                            <strong>用户研究</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <footer class="footer" id="contact">
+        <div class="container">
+            <h3>让我们一起创造美好的产品</h3>
+            <p>📧 contact@designer.com | 📱 +86 138 0000 0000</p>
+            <p>&copy; 2024 张设计师作品集. 保留所有权利.</p>
+        </div>
+    </footer>
+</body>
+</html>`
+            };
+            
+            if (templates[templateName]) {
+                editor.setValue(templates[templateName]);
+                showToast(`${templateName}模板已加载！`);
+            }
+        }
+
+        // 键盘快捷键处理
+        document.addEventListener('keydown', function(e) {
+            // 阻止浏览器默认的Ctrl+S行为
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveFile();
+            }
+            
+            // ESC键退出全屏
+            if (e.key === 'Escape') {
+                const previewPanel = document.querySelector('.preview-panel');
+                if (previewPanel.style.position === 'fixed') {
+                    toggleFullscreen();
+                }
+            }
+        });
+
+        // 窗口调整大小时重新计算编辑器尺寸
+        window.addEventListener('resize', function() {
+            editor.refresh();
+        });
+
+        // 防止意外离开页面时丢失内容
+        window.addEventListener('beforeunload', function(e) {
+            const code = editor.getValue();
+            const defaultCode = document.getElementById('codeEditor').defaultValue;
+            if (code !== defaultCode && code.trim() !== '') {
+                const message = '您有未保存的更改，确定要离开吗？';
+                e.returnValue = message;
+                return message;
+            }
+        });
+
+        // 自动保存功能（可选）
+        let autoSaveTimer;
+        editor.on('change', function() {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(function() {
+                // 这里可以实现自动保存到localStorage的逻辑
+                // 但由于artifacts限制，我们只显示提示
+                console.log('自动保存触发');
+            }, 30000); // 30秒后自动保存
+        });
     </script>
 </body>
 </html>
