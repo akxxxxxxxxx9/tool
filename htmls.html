@@ -914,37 +914,74 @@ function showAlert() {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>基础页面</title>
+    <title>我的第一个网页</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
             max-width: 800px;
             margin: 0 auto;
-            background: white;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
             padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
         h1 {
-            color: #333;
             text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .rainbow-text {
+            background: linear-gradient(45deg,
+                #ff0000, #ff7700, #ffdd00, #00ff00,
+                #0099ff, #6600ff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: rainbow 3s ease-in-out infinite;
+        }
+        @keyframes rainbow {
+            0%, 100% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(180deg); }
         }
         p {
+            font-size: 1.2rem;
             line-height: 1.6;
-            color: #666;
+            margin: 20px 0;
+        }
+        .highlight {
+            background: rgba(255, 255, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>欢迎来到我的网站</h1>
-        <p>这是一个基础的HTML页面模板，包含了基本的样式和结构。您可以在此基础上进行扩展和定制。</p>
-        <p>页面采用了简洁的设计风格，具有良好的可读性和用户体验。</p>
+        <h1 class="rainbow-text">🌟 欢迎来到我的网页世界！</h1>
+        <p>这是一个 <span class="highlight">现代化的HTML页面</span>，展示了CSS的强大功能。</p>
+        <p>✨ 在左侧编辑器中修改代码，右侧会实时显示效果！</p>
+        <p>🚀 开始你的HTML编程之旅吧！</p>
+  <h1 style="color: #ff6600;">欢迎体验HTML编辑器</h1>
+    <p>
+  <span style="color: red;">在</span>
+  <span style="color: orange;">这</span>
+  <span style="color: yellow;">里</span>
+  <span style="color: green;">编</span>
+  <span style="color: blue;">写</span>
+  <span style="color: indigo;">H</span>
+  <span style="color: violet;">T</span>
+  <span style="color: teal;">M</span>
+  <span style="color: brown;">L</span>
+  <span>代码，实时预览效果！</span>
+</p>
     </div>
 </body>
 </html>`,
