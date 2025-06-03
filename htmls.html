@@ -416,6 +416,10 @@
             <button class="btn btn-secondary" onclick="exportHTML()">
                 📤 导出
             </button>
+                        <button class="btn btn-secondary" id="importBtn">
+                📥 导入文件
+            </button>
+            <input type="file" id="importFile" accept=".html,.htm,.txt" style="display:none">
             <button class="btn btn-icon" onclick="toggleFullscreen()" title="全屏预览">
                 🔍
             </button>
@@ -2324,6 +2328,32 @@ fetchData();
                 // 但由于artifacts限制，我们只显示提示
                 console.log('自动保存触发');
             }, 30000); // 30秒后自动保存
+        });
+         // 导入文件功能
+        document.getElementById('importBtn').addEventListener('click', function() {
+            document.getElementById('importFile').click();
+        });
+        document.getElementById('importFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                if (evt.target.readyState === FileReader.DONE) {
+                    editor.setValue(evt.target.result);
+                    showToast('文件已导入！');
+                }
+            };
+            reader.readAsText(file, 'utf-8');
+            // 清空value以便连续导入同一文件
+            e.target.value = '';
+        });
+
+        // 双击预览区退出全屏
+        document.querySelector('.preview-panel').addEventListener('dblclick', function() {
+            const previewPanel = document.querySelector('.preview-panel');
+            if (previewPanel.style.position === 'fixed') {
+                toggleFullscreen();
+            }
         });
     </script>
 </body>
