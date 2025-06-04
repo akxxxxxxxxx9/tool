@@ -137,8 +137,9 @@
 
         .replace-group {
             display: flex;
-            align-items: center;
-            gap: 12px;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
             margin-bottom: 12px;
             background: var(--light);
             padding: 16px;
@@ -156,9 +157,10 @@
             padding: 10px 14px;
             border: 1px solid var(--border);
             border-radius: 8px;
-            flex: 1;
+            width: 100%;
             font-size: 0.95rem;
             transition: all 0.3s ease;
+            box-sizing: border-box;
         }
 
         .replace-group input:focus {
@@ -315,6 +317,25 @@
         .file-input-label:hover {
             border-color: var(--primary);
             background: #f1f8ff;
+        }
+      
+        .rainbow-text {
+            background: linear-gradient(45deg,
+                #ff0000, #ff7700, #ffdd00, #00ff00,
+                #0099ff, #6600ff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: rainbow 3s ease-in-out infinite;
+        }
+        @keyframes rainbow {
+            0%, 100% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(180deg); }
+        }
+        p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin: 20px 0;
         }
 
         .stats {
@@ -576,7 +597,7 @@
         <div class="main-content">
             <div class="header">
                 <h1><i class="fas fa-code"></i> CodeSwapper Pro</h1>
-                <p>智能代码替换工具，让文本处理更高效</p>
+                <h2 class="rainbow-text">智能代码替换工具，让文本处理更高效</h2>
             </div>
 
             <div class="file-input">
@@ -624,6 +645,32 @@
             <div class="textarea-container">
                 <div class="textarea-label">处理结果</div>
                 <textarea id="outputCode" placeholder="处理后的代码将在这里显示..." readonly></textarea>
+
+<!-- 功能使用说明区域 -->
+<div class="section" style="margin-top: 24px; background: #f8fafc; border-radius: 12px; padding: 24px; border: 1px solid #e2e8f0;">
+    <div class="section-title" style="font-size: 1.1rem; color: #4f46e5; margin-bottom: 12px;">
+        <i class="fas fa-info-circle"></i> 功能使用说明
+    </div>
+    <div style="color: #334155; font-size: 1rem; line-height: 1.8;">
+      <h2 class="rainbow-text">1. 替换配置：</h><br>
+        在左侧“替换配置”区域，可自定义多组查找与替换规则，支持区分大小写、正则表达式、全词匹配等选项，并可选择常用预设模板（如大小写转换、HTML实体转换等）。<br><br>
+        <b class="rainbow-text">2. 输入与处理：</b><br>
+        在“待处理输入”框粘贴或输入你的文本或代码，点击“执行替换”按钮后，结果会显示在“处理结果”框。<br><br>
+        <b class="rainbow-text">3. 结果操作：</b><br>
+        处理结果支持一键复制、下载为文件。可通过“撤销”按钮回退上一步操作，通过“重置”清空所有内容。<br><br>
+        <b class="rainbow-text">4. 规则管理：</b><br>
+        可批量添加、删除替换规则，支持导入/导出配置，便于多场景复用。<br><br>
+        <b class="rainbow-text">5. 统计与历史：</b><br>
+        左下角实时统计字符数、行数、单词数等信息，操作历史可追溯每一步替换记录。<br><br>
+        <b class="rainbow-text">6. 注意事项：</b><br>
+        - 使用正则表达式时请确保语法正确，否则会提示错误。<br>
+        - 替换操作不可逆，建议先导出原始内容备份。<br>
+        - 大文本处理时，浏览器性能可能受限。<br><br>
+        <b class="rainbow-text">7. 其他功能：</b><br>
+        支持代码美化、格式化，适合开发者批量处理代码片段。<br><br>
+        如需帮助或有建议，欢迎反馈！
+    </div>
+</div>
             </div>
         </div>
     </div>
