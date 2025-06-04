@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代码替换工具 - CodeSwapper</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            font-size: 2.2em;
+            color: #333;
+        }
+        header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        .replace-section {
+            margin-bottom: 20px;
+        }
+        .replace-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .replace-group input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            flex: 1;
+            font-size: 1em;
+        }
+        .replace-group button {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .replace-group button:hover {
+            background: #e63939;
+        }
+        .preset-section {
+            margin-bottom: 20px;
+        }
+        .preset-section select {
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 1em;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s, transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+        textarea[readonly] {
+            background: #f8f9fa;
+        }
+        footer {
+            text-align: center;
+            color: #666;
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+        .file-input {
+            margin-bottom: 15px;
+        }
+        .file-input input {
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CodeSwapper</h1>
+            <p>高效的代码替换工具，支持多组替换和预设规则</p>
+        </header>
+
+        <div class="preset-section">
+            <label for="presets">选择替换预设：</label>
+            <select id="presets" onchange="applyPreset()">
+                <option value="">选择一个预设...</option>
+                <option value="case">大小写转换 (a to A, b to B)</option>
+                <option value="custom">自定义预设</option>
+            </select>
+        </div>
+
+        <div class="replace-section" id="replacePairs">
+            <div class="replace-group">
+                <input type="text" class="from" placeholder="原字符 (例: a)">
+                <input type="text" class="to" placeholder="替换为 (例: c)">
+                <button onclick="removeReplacePair(this)">删除</button>
+            </div>
+        </div>
+        <button class="btn-primary" onclick="addReplacePair()">添加替换规则</button>
+
+        <div class="file-input">
+            <input type="file" id="fileInput" accept=".txt,.js,.html">
+        </div>
+
+        <textarea id="inputCode" placeholder="请输入或上传需要替换的代码"></textarea>
+
+        <div class="action-buttons">
+            <button class="btn-primary" onclick="replaceCode()">执行替换</button>
+            <button class="btn-secondary" onclick="copyCode()">复制结果</button>
+            <button class="btn-secondary" onclick="downloadCode()">下载结果</button>
+            <button class="btn-secondary" onclick="resetAll()">重置</button>
+        </div>
+
+        <textarea id="outputCode" placeholder="替换后的代码将显示在这里" readonly></textarea>
+
+        <footer>
+            &copy; 2025 CodeSwapper. All Rights Reserved.
+        </footer>
+    </div>
+
+    <script>
+        // 预设规则
+        const presets = {
+            case: [
+                { from: 'a', to: 'A' },
+                { from: 'b', to: 'B' }
+            ],
+            custom: []
+        };
+
+        // 应用预设
+        function applyPreset() {
+            const presetSelect = document.getElementById('presets');
+            const selectedPreset = presetSelect.value;
+            const replacePairs = document.getElementById('replacePairs');
+            replacePairs.innerHTML = '';
+
+            if (selectedPreset && presets[selectedPreset]) {
+                presets[selectedPreset].forEach(pair => {
+                    const newPair = document.createElement('div');
+                    newPair.className = 'replace-group';
+                    newPair.innerHTML = `
+                        <input type="text" class="from" value="${pair.from}" placeholder="原字符">
+                        <input type="text" class="to" value="${pair.to}" placeholder="替换为">
+                        <button onclick="removeReplacePair(this)">删除</button>
+                    `;
+                    replacePairs.appendChild(newPair);
+                });
+            } else {
+                addReplacePair();
+            }
+        }
+
+        // 添加替换规则
+        function addReplacePair() {
+            const replacePairs = document.getElementById('replacePairs');
+            const newPair = document.createElement('div');
+            newPair.className = 'replace-group';
+            newPair.innerHTML = `
+                <input type="text" class="from" placeholder="原字符">
+                <input type="text" class="to" placeholder="替换为">
+                <button onclick="removeReplacePair(this)">删除</button>
+            `;
+            replacePairs.appendChild(newPair);
+        }
+
+        // 删除替换规则
+        function removeReplacePair(button) {
+            if (document.querySelectorAll('.replace-group').length > 1) {
+                button.parentElement.remove();
+            }
+        }
+
+        // 执行替换
+        function replaceCode() {
+            let code = document.getElementById('inputCode').value;
+            const pairs = document.querySelectorAll('.replace-group');
+            pairs.forEach(pair => {
+                const from = pair.querySelector('.from').value;
+                const to = pair.querySelector('.to').value;
+                if (from && to) {
+                    const escapedFrom = from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp(escapedFrom, 'g');
+                    code = code.replace(regex, to);
+                }
+            });
+            document.getElementById('outputCode').value = code;
+        }
+
+        // 上传文件
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('inputCode').value = e.target.result;
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // 复制代码
+        function copyCode() {
+            const outputCode = document.getElementById('outputCode');
+            outputCode.select();
+            document.execCommand('copy');
+            alert('已复制到剪贴板！');
+        }
+
+        // 下载代码
+        function downloadCode() {
+            const outputCode = document.getElementById('outputCode').value;
+            const blob = new Blob([outputCode], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'replaced_code.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 重置
+        function resetAll() {
+            document.getElementById('inputCode').value = '';
+            document.getElementById('outputCode').value = '';
+            document.getElementById('presets').value = '';
+            document.getElementById('fileInput').value = '';
+            const replacePairs = document.getElementById('replacePairs');
+            replacePairs.innerHTML = `
+                <div class="replace-group">
+                    <input type="text" class="from" placeholder="原字符 (例: a)">
+                    <input type="text" class="to" placeholder="替换为 (例: c)">
+                    <button onclick="removeReplacePair(this)">删除</button>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
+
