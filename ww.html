@@ -3,196 +3,658 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>代码替换工具 - CodeSwapper</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>CodeSwapper Pro - 智能代码替换工具</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f1f5f9;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Inter', sans-serif;
+            background: var(--gradient);
             min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            flex-direction: column;
+            color: var(--dark);
         }
-        .container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            max-width: 900px;
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
             width: 100%;
         }
-        header {
+
+        .sidebar {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            padding: 24px;
+            width: 350px;
+            height: fit-content;
+            backdrop-filter: blur(10px);
+        }
+
+        .main-content {
+            flex: 1;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            padding: 32px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
+            position: relative;
         }
-        header h1 {
-            font-size: 2.2em;
-            color: #333;
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: var(--gradient);
+            border-radius: 2px;
         }
-        header p {
-            color: #666;
-            font-size: 1.1em;
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
         }
-        .replace-section {
-            margin-bottom: 20px;
+
+        .header p {
+            color: #64748b;
+            font-size: 1.1rem;
+            font-weight: 400;
         }
+
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .preset-section select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .preset-section select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
         .replace-group {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-            background: #f9f9f9;
-            padding: 10px;
-            border-radius: 8px;
+            gap: 12px;
+            margin-bottom: 12px;
+            background: var(--light);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
         }
+
+        .replace-group:hover {
+            background: #f1f8ff;
+            border-color: var(--primary);
+        }
+
         .replace-group input {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
             flex: 1;
-            font-size: 1em;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
         }
-        .replace-group button {
-            background: #ff4d4d;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
+
+        .replace-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
-        .replace-group button:hover {
-            background: #e63939;
-        }
-        .preset-section {
-            margin-bottom: 20px;
-        }
-        .preset-section select {
-            padding: 10px;
-            width: 100%;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            font-size: 1em;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        button {
+
+        .btn {
             padding: 10px 20px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 1em;
-            transition: background 0.3s, transform 0.2s;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
         }
-        button:hover {
+
+        .btn:hover {
             transform: translateY(-2px);
+            box-shadow: var(--shadow);
         }
+
         .btn-primary {
-            background: #007bff;
+            background: var(--primary);
             color: white;
         }
+
         .btn-primary:hover {
-            background: #0056b3;
+            background: var(--primary-dark);
         }
+
         .btn-secondary {
-            background: #6c757d;
+            background: #64748b;
             color: white;
         }
+
         .btn-secondary:hover {
-            background: #5a6268;
+            background: #475569;
         }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            background: #0891b2;
+        }
+
+        .textarea-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .textarea-label {
+            position: absolute;
+            top: -8px;
+            left: 16px;
+            background: white;
+            padding: 0 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--primary);
+        }
+
         textarea {
             width: 100%;
-            height: 200px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1em;
+            height: 220px;
+            padding: 20px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-family: 'Consolas', 'Monaco', monospace;
             resize: vertical;
-            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            background: #fafbfc;
         }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: white;
+        }
+
         textarea[readonly] {
-            background: #f8f9fa;
+            background: var(--light);
+            cursor: not-allowed;
         }
-        footer {
-            text-align: center;
-            color: #666;
-            margin-top: 20px;
-            font-size: 0.9em;
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
         }
+
         .file-input {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
         .file-input input {
-            padding: 5px;
+            opacity: 0;
+            position: absolute;
+            z-index: -1;
+        }
+
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--light);
+            text-align: center;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .file-input-label:hover {
+            border-color: var(--primary);
+            background: #f1f8ff;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--light);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .history {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            background: var(--light);
+        }
+
+        .history-item {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: var(--success);
+        }
+
+        .toast.error {
+            background: var(--danger);
+        }
+
+        .advanced-options {
+            background: var(--light);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+
+        .checkbox-item label {
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                padding: 12px;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff40;
+            border-radius: 50%;
+            border-top-color: #ffffff;
+            animation: spin 0.8s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .collapsible {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .collapsible.collapsed + .section-content {
+            display: none;
+        }
+
+        .section-content {
+            transition: all 0.3s ease;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>CodeSwapper</h1>
-            <p>高效的代码替换工具，支持多组替换和预设规则</p>
-        </header>
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="section">
+                <div class="section-title collapsible" onclick="toggleSection(this)">
+                    <i class="fas fa-cog"></i>
+                    替换配置
+                    <i class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+                </div>
+                <div class="section-content">
+                    <div class="preset-section">
+                        <select id="presets" onchange="applyPreset()">
+                            <option value="">选择预设模板...</option>
+                            <option value="case">大小写转换</option>
+                            <option value="html">HTML实体转换</option>
+                            <option value="quotes">引号转换</option>
+                            <option value="spaces">空格处理</option>
+                            <option value="custom">自定义预设</option>
+                        </select>
+                    </div>
+                    
+                    <div class="advanced-options">
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="caseSensitive">
+                                <label for="caseSensitive">区分大小写</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="useRegex">
+                                <label for="useRegex">使用正则表达式</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="wholeWord">
+                                <label for="wholeWord">仅匹配完整单词</label>
+                            </div>
+                        </div>
+                    </div>
 
-        <div class="preset-section">
-            <label for="presets">选择替换预设：</label>
-            <select id="presets" onchange="applyPreset()">
-                <option value="">选择一个预设...</option>
-                <option value="case">大小写转换 (a to A, b to B)</option>
-                <option value="custom">自定义预设</option>
-            </select>
-        </div>
+                    <div class="replace-section" id="replacePairs">
+                        <div class="replace-group">
+                            <input type="text" class="from" placeholder="查找内容">
+                            <input type="text" class="to" placeholder="替换为">
+                            <button class="btn btn-danger" onclick="removeReplacePair(this)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="addReplacePair()" style="width: 100%;">
+                        <i class="fas fa-plus"></i>
+                        添加规则
+                    </button>
+                </div>
+            </div>
 
-        <div class="replace-section" id="replacePairs">
-            <div class="replace-group">
-                <input type="text" class="from" placeholder="原字符 (例: a)">
-                <input type="text" class="to" placeholder="替换为 (例: c)">
-                <button onclick="removeReplacePair(this)">删除</button>
+            <div class="section">
+                <div class="section-title collapsible" onclick="toggleSection(this)">
+                    <i class="fas fa-chart-bar"></i>
+                    统计信息
+                    <i class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+                </div>
+                <div class="section-content">
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-number" id="charCount">0</div>
+                            <div class="stat-label">字符数</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="lineCount">0</div>
+                            <div class="stat-label">行数</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="replaceCount">0</div>
+                            <div class="stat-label">替换次数</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="wordCount">0</div>
+                            <div class="stat-label">单词数</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title collapsible" onclick="toggleSection(this)">
+                    <i class="fas fa-history"></i>
+                    操作历史
+                    <i class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+                </div>
+                <div class="section-content">
+                    <div class="history" id="historyList">
+                        <div style="text-align: center; color: #64748b; padding: 20px;">
+                            暂无操作记录
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="clearHistory()" style="width: 100%; margin-top: 12px;">
+                        <i class="fas fa-broom"></i>
+                        清空历史
+                    </button>
+                </div>
             </div>
         </div>
-        <button class="btn-primary" onclick="addReplacePair()">添加替换规则</button>
 
-        <div class="file-input">
-            <input type="file" id="fileInput" accept=".txt,.js,.html">
+        <div class="main-content">
+            <div class="header">
+                <h1><i class="fas fa-code"></i> CodeSwapper Pro</h1>
+                <p>智能代码替换工具，让文本处理更高效</p>
+            </div>
+
+            <div class="file-input">
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" accept=".txt,.js,.html,.css,.json,.xml,.md">
+                    <label for="fileInput" class="file-input-label">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 1.2rem;"></i>
+                        点击上传文件或拖拽文件到此处
+                    </label>
+                </div>
+            </div>
+
+            <div class="textarea-container">
+                <div class="textarea-label">源代码输入</div>
+                <textarea id="inputCode" placeholder="请输入需要处理的代码或文本..." oninput="updateStats()"></textarea>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="replaceCode()">
+                    <i class="fas fa-magic"></i>
+                    执行替换
+                </button>
+                <button class="btn btn-success" onclick="copyCode()">
+                    <i class="fas fa-copy"></i>
+                    复制结果
+                </button>
+                <button class="btn btn-accent" onclick="downloadCode()">
+                    <i class="fas fa-download"></i>
+                    下载结果
+                </button>
+                <button class="btn btn-secondary" onclick="resetAll()">
+                    <i class="fas fa-undo"></i>
+                    重置
+                </button>
+                <button class="btn btn-secondary" onclick="undoReplace()">
+                    <i class="fas fa-arrow-left"></i>
+                    撤销
+                </button>
+                <button class="btn btn-secondary" onclick="beautifyCode()">
+                    <i class="fas fa-magic"></i>
+                    美化代码
+                </button>
+            </div>
+
+            <div class="textarea-container">
+                <div class="textarea-label">处理结果</div>
+                <textarea id="outputCode" placeholder="处理后的代码将在这里显示..." readonly></textarea>
+            </div>
         </div>
-
-        <textarea id="inputCode" placeholder="请输入或上传需要替换的代码"></textarea>
-
-        <div class="action-buttons">
-            <button class="btn-primary" onclick="replaceCode()">执行替换</button>
-            <button class="btn-secondary" onclick="copyCode()">复制结果</button>
-            <button class="btn-secondary" onclick="downloadCode()">下载结果</button>
-            <button class="btn-secondary" onclick="resetAll()">重置</button>
-        </div>
-
-        <textarea id="outputCode" placeholder="替换后的代码将显示在这里" readonly></textarea>
-
-        <footer>
-            &copy; 2025 CodeSwapper. All Rights Reserved.
-        </footer>
     </div>
 
     <script>
-        // 预设规则
+        // 增强的预设规则
         const presets = {
             case: [
                 { from: 'a', to: 'A' },
-                { from: 'b', to: 'B' }
+                { from: 'b', to: 'B' },
+                { from: 'c', to: 'C' }
+            ],
+            html: [
+                { from: '<', to: '&lt;' },
+                { from: '>', to: '&gt;' },
+                { from: '&', to: '&amp;' },
+                { from: '"', to: '&quot;' }
+            ],
+            quotes: [
+                { from: '"', to: '\'' },
+                { from: '\'', to: '"' }
+            ],
+            spaces: [
+                { from: '  ', to: ' ' },
+                { from: '\t', to: '    ' }
             ],
             custom: []
         };
+
+        let operationHistory = [];
+        let currentStep = -1;
 
         // 应用预设
         function applyPreset() {
@@ -203,30 +665,34 @@
 
             if (selectedPreset && presets[selectedPreset]) {
                 presets[selectedPreset].forEach(pair => {
-                    const newPair = document.createElement('div');
-                    newPair.className = 'replace-group';
-                    newPair.innerHTML = `
-                        <input type="text" class="from" value="${pair.from}" placeholder="原字符">
-                        <input type="text" class="to" value="${pair.to}" placeholder="替换为">
-                        <button onclick="removeReplacePair(this)">删除</button>
-                    `;
+                    const newPair = createReplacePair(pair.from, pair.to);
                     replacePairs.appendChild(newPair);
                 });
             } else {
                 addReplacePair();
             }
+            
+            addToHistory('应用预设', selectedPreset || '默认');
+        }
+
+        // 创建替换规则元素
+        function createReplacePair(fromValue = '', toValue = '') {
+            const newPair = document.createElement('div');
+            newPair.className = 'replace-group';
+            newPair.innerHTML = `
+                <input type="text" class="from" value="${fromValue}" placeholder="查找内容">
+                <input type="text" class="to" value="${toValue}" placeholder="替换为">
+                <button class="btn btn-danger" onclick="removeReplacePair(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            return newPair;
         }
 
         // 添加替换规则
         function addReplacePair() {
             const replacePairs = document.getElementById('replacePairs');
-            const newPair = document.createElement('div');
-            newPair.className = 'replace-group';
-            newPair.innerHTML = `
-                <input type="text" class="from" placeholder="原字符">
-                <input type="text" class="to" placeholder="替换为">
-                <button onclick="removeReplacePair(this)">删除</button>
-            `;
+            const newPair = createReplacePair();
             replacePairs.appendChild(newPair);
         }
 
@@ -239,68 +705,445 @@
 
         // 执行替换
         function replaceCode() {
-            let code = document.getElementById('inputCode').value;
+            const inputCode = document.getElementById('inputCode');
+            const outputCode = document.getElementById('outputCode');
+            let code = inputCode.value;
+            const originalCode = code;
             const pairs = document.querySelectorAll('.replace-group');
+            let totalReplacements = 0;
+
+            // 保存当前状态到历史
+            saveToHistory(originalCode);
+
+            const caseSensitive = document.getElementById('caseSensitive').checked;
+            const useRegex = document.getElementById('useRegex').checked;
+            const wholeWord = document.getElementById('wholeWord').checked;
+
             pairs.forEach(pair => {
                 const from = pair.querySelector('.from').value;
                 const to = pair.querySelector('.to').value;
-                if (from && to) {
-                    const escapedFrom = from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                    const regex = new RegExp(escapedFrom, 'g');
-                    code = code.replace(regex, to);
+                if (from) {
+                    let pattern;
+                    let flags = caseSensitive ? 'g' : 'gi';
+                    
+                    if (useRegex) {
+                        try {
+                            pattern = new RegExp(from, flags);
+                        } catch (e) {
+                            showToast('正则表达式错误: ' + e.message, 'error');
+                            return;
+                        }
+                    } else {
+                        let escapedFrom = from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        if (wholeWord) {
+                            escapedFrom = '\\b' + escapedFrom + '\\b';
+                        }
+                        pattern = new RegExp(escapedFrom, flags);
+                    }
+                    
+                    const matches = code.match(pattern);
+                    if (matches) {
+                        totalReplacements += matches.length;
+                    }
+                    code = code.replace(pattern, to || '');
                 }
             });
-            document.getElementById('outputCode').value = code;
+
+            outputCode.value = code;
+            document.getElementById('replaceCount').textContent = totalReplacements;
+            updateStats();
+            
+            if (totalReplacements > 0) {
+                showToast(`成功替换 ${totalReplacements} 处内容`, 'success');
+                addToHistory('执行替换', `${totalReplacements} 处`);
+            } else {
+                showToast('未找到匹配的内容', 'error');
+            }
         }
 
-        // 上传文件
+        // 保存到历史记录
+        function saveToHistory(code) {
+            operationHistory = operationHistory.slice(0, currentStep + 1);
+            operationHistory.push(code);
+            currentStep++;
+        }
+
+        // 撤销操作
+        function undoReplace() {
+            if (currentStep > 0) {
+                currentStep--;
+                document.getElementById('inputCode').value = operationHistory[currentStep];
+                document.getElementById('outputCode').value = '';
+                updateStats();
+                showToast('已撤销上一步操作', 'success');
+                addToHistory('撤销操作', '');
+            } else {
+                showToast('没有可撤销的操作', 'error');
+            }
+        }
+
+        // 美化代码
+        function beautifyCode() {
+            const code = document.getElementById('inputCode').value;
+            if (!code.trim()) return;
+
+            try {
+                // 简单的代码美化
+                let beautified = code
+                    .replace(/;\s*}/g, ';\n}')
+                    .replace(/{\s*/g, ' {\n    ')
+                    .replace(/}\s*/g, '\n}\n')
+                    .replace(/,\s*/g, ',\n    ')
+                    .replace(/^\s+/gm, (match) => '    '.repeat(match.length / 4));
+                    
+                document.getElementById('outputCode').value = beautified;
+                showToast('代码美化完成', 'success');
+                addToHistory('美化代码', '');
+            } catch (e) {
+                showToast('代码美化失败', 'error');
+            }
+        }
+
+        // 文件上传处理
         document.getElementById('fileInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     document.getElementById('inputCode').value = e.target.result;
+                    updateStats();
+                    showToast(`文件 "${file.name}" 加载成功`, 'success');
+                    addToHistory('加载文件', file.name);
                 };
                 reader.readAsText(file);
+            }
+        });
+
+        // 拖拽文件支持
+        const fileLabel = document.querySelector('.file-input-label');
+        
+        fileLabel.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'var(--primary)';
+            this.style.background = '#f1f8ff';
+        });
+
+        fileLabel.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'var(--border)';
+            this.style.background = 'var(--light)';
+        });
+
+        fileLabel.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'var(--border)';
+            this.style.background = 'var(--light)';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('fileInput').files = files;
+                document.getElementById('fileInput').dispatchEvent(new Event('change'));
             }
         });
 
         // 复制代码
         function copyCode() {
             const outputCode = document.getElementById('outputCode');
+            if (!outputCode.value.trim()) {
+                showToast('没有可复制的内容', 'error');
+                return;
+            }
+            
             outputCode.select();
             document.execCommand('copy');
-            alert('已复制到剪贴板！');
+            showToast('已复制到剪贴板', 'success');
+            addToHistory('复制结果', '');
         }
 
         // 下载代码
         function downloadCode() {
             const outputCode = document.getElementById('outputCode').value;
-            const blob = new Blob([outputCode], { type: 'text/plain' });
+            if (!outputCode.trim()) {
+                showToast('没有可下载的内容', 'error');
+                return;
+            }
+            
+            const blob = new Blob([outputCode], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'replaced_code.txt';
+            a.download = `processed_code_${new Date().getTime()}.txt`;
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            
+            showToast('文件下载已开始', 'success');
+            addToHistory('下载文件', a.download);
         }
 
-        // 重置
+        // 重置所有内容
         function resetAll() {
             document.getElementById('inputCode').value = '';
             document.getElementById('outputCode').value = '';
             document.getElementById('presets').value = '';
             document.getElementById('fileInput').value = '';
+            document.getElementById('caseSensitive').checked = false;
+            document.getElementById('useRegex').checked = false;
+            document.getElementById('wholeWord').checked = false;
+            
             const replacePairs = document.getElementById('replacePairs');
-            replacePairs.innerHTML = `
-                <div class="replace-group">
-                    <input type="text" class="from" placeholder="原字符 (例: a)">
-                    <input type="text" class="to" placeholder="替换为 (例: c)">
-                    <button onclick="removeReplacePair(this)">删除</button>
+            replacePairs.innerHTML = '';
+            replacePairs.appendChild(createReplacePair());
+            
+            operationHistory = [];
+            currentStep = -1;
+            updateStats();
+            showToast('已重置所有内容', 'success');
+        }
+
+        // 更新统计信息
+        function updateStats() {
+            const inputCode = document.getElementById('inputCode').value;
+            const outputCode = document.getElementById('outputCode').value;
+            
+            // 计算字符数
+            document.getElementById('charCount').textContent = inputCode.length;
+            
+            // 计算行数
+            const lines = inputCode.split('\n').length;
+            document.getElementById('lineCount').textContent = lines;
+            
+            // 计算单词数
+            const words = inputCode.trim() ? inputCode.trim().split(/\s+/).length : 0;
+            document.getElementById('wordCount').textContent = words;
+        }
+
+        // 显示提示消息
+        function showToast(message, type = 'success') {
+            // 移除现有的toast
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            // 显示toast
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // 3秒后隐藏
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // 添加到操作历史
+        function addToHistory(operation, details) {
+            const historyList = document.getElementById('historyList');
+            const time = new Date().toLocaleTimeString();
+            
+            // 如果是第一条记录，清空占位文本
+            if (historyList.children.length === 1 && historyList.children[0].style.textAlign === 'center') {
+                historyList.innerHTML = '';
+            }
+            
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.innerHTML = `
+                <div>
+                    <div style="font-weight: 500;">${operation}</div>
+                    <div style="color: #64748b; font-size: 0.8rem;">${details}</div>
+                </div>
+                <div style="color: #64748b; font-size: 0.8rem;">${time}</div>
+            `;
+            
+            historyList.insertBefore(historyItem, historyList.firstChild);
+            
+            // 限制历史记录数量
+            if (historyList.children.length > 10) {
+                historyList.removeChild(historyList.lastChild);
+            }
+        }
+
+        // 清空历史记录
+        function clearHistory() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = `
+                <div style="text-align: center; color: #64748b; padding: 20px;">
+                    暂无操作记录
                 </div>
             `;
+            showToast('历史记录已清空', 'success');
+        }
+
+        // 切换折叠区域
+        function toggleSection(element) {
+            const chevron = element.querySelector('.fa-chevron-down');
+            const content = element.nextElementSibling;
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                chevron.style.transform = 'rotate(0deg)';
+            } else {
+                content.style.display = 'none';
+                chevron.style.transform = 'rotate(-90deg)';
+            }
+        }
+
+        // 键盘快捷键支持
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'Enter':
+                        e.preventDefault();
+                        replaceCode();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        downloadCode();
+                        break;
+                    case 'z':
+                        e.preventDefault();
+                        undoReplace();
+                        break;
+                    case 'r':
+                        e.preventDefault();
+                        resetAll();
+                        break;
+                }
+            }
+        });
+
+        // 自动保存功能
+        let autoSaveTimer;
+        document.getElementById('inputCode').addEventListener('input', function() {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                if (this.value.trim()) {
+                    // 这里可以添加自动保存到浏览器存储的逻辑
+                    // 由于限制，我们只是更新统计信息
+                    updateStats();
+                }
+            }, 1000);
+        });
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化一个替换规则
+            addReplacePair();
+            updateStats();
+            
+            // 添加欢迎消息
+            setTimeout(() => {
+                showToast('欢迎使用 CodeSwapper Pro！', 'success');
+            }, 500);
+        });
+
+        // 搜索高亮功能
+        function highlightMatches() {
+            const inputCode = document.getElementById('inputCode');
+            const pairs = document.querySelectorAll('.replace-group');
+            
+            pairs.forEach(pair => {
+                const from = pair.querySelector('.from').value;
+                if (from && inputCode.value.includes(from)) {
+                    // 这里可以添加高亮显示逻辑
+                    console.log(`Found matches for: ${from}`);
+                }
+            });
+        }
+
+        // 批量替换功能
+        function batchReplace() {
+            const textarea = document.getElementById('inputCode');
+            const text = textarea.value;
+            
+            // 常见的批量替换规则
+            const batchRules = [
+                { from: /\s+$/gm, to: '' }, // 删除行尾空格
+                { from: /\n\s*\n\s*\n/g, to: '\n\n' }, // 合并多个空行
+                { from: /\t/g, to: '    ' } // 制表符转空格
+            ];
+            
+            let result = text;
+            batchRules.forEach(rule => {
+                result = result.replace(rule.from, rule.to);
+            });
+            
+            document.getElementById('outputCode').value = result;
+            showToast('批量清理完成', 'success');
+            addToHistory('批量清理', '清理空格和空行');
+        }
+
+        // 导出配置
+        function exportConfig() {
+            const pairs = Array.from(document.querySelectorAll('.replace-group')).map(pair => ({
+                from: pair.querySelector('.from').value,
+                to: pair.querySelector('.to').value
+            }));
+            
+            const config = {
+                pairs: pairs,
+                caseSensitive: document.getElementById('caseSensitive').checked,
+                useRegex: document.getElementById('useRegex').checked,
+                wholeWord: document.getElementById('wholeWord').checked,
+                preset: document.getElementById('presets').value
+            };
+            
+            const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'codeswapper_config.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('配置已导出', 'success');
+        }
+
+        // 导入配置
+        function importConfig() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const config = JSON.parse(e.target.result);
+                            
+                            // 清空现有规则
+                            document.getElementById('replacePairs').innerHTML = '';
+                            
+                            // 应用配置
+                            config.pairs.forEach(pair => {
+                                const newPair = createReplacePair(pair.from, pair.to);
+                                document.getElementById('replacePairs').appendChild(newPair);
+                            });
+                            
+                            document.getElementById('caseSensitive').checked = config.caseSensitive || false;
+                            document.getElementById('useRegex').checked = config.useRegex || false;
+                            document.getElementById('wholeWord').checked = config.wholeWord || false;
+                            document.getElementById('presets').value = config.preset || '';
+                            
+                            showToast('配置导入成功', 'success');
+                            addToHistory('导入配置', file.name);
+                        } catch (error) {
+                            showToast('配置文件格式错误', 'error');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
         }
     </script>
 </body>
 </html>
-
